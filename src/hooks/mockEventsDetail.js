@@ -1,10 +1,10 @@
-// ═══════════════════════════════════════════════════════════════
+
 // FILE: src/data/MOCK_EVENTS_DETAIL.js
 //
 // 24 events — 6 per community:
 //   Family   → id: 1–6
 //   Male     → id: 7–12
-//   Female   → id: 13–18
+//   Female   → id: 13-18
 //   Combined → id: 19–24
 //
 // How to use in community pages:
@@ -16,7 +16,7 @@
 //   const event = getEventById(id);  // id from useParams()
 //
 // TODO: Replace with real API → GET /api/events and GET /api/events/:id
-// ═══════════════════════════════════════════════════════════════
+
 
 const STANDARD_TERMS = {
   general: [
@@ -43,9 +43,9 @@ const STANDARD_TERMS = {
 
 export const MOCK_EVENTS_DETAIL = [
 
-  // ╔══════════════════════════════════════════════════════════╗
-  // ║                   FAMILY  (id: 1–6)                     ║
-  // ╚══════════════════════════════════════════════════════════╝
+  
+  //                   FAMILY  (id: 1–6)                     
+  
 
   {
     id: 1,
@@ -366,10 +366,9 @@ export const MOCK_EVENTS_DETAIL = [
     ],
   },
 
-  // ╔══════════════════════════════════════════════════════════╗
-  // ║                    MALE  (id: 7–12)                     ║
-  // ╚══════════════════════════════════════════════════════════╝
-
+  
+  //                    MALE  (id: 7–12)                    
+  
   {
     id: 7,
     title: "Bandarban Hill Trek",
@@ -679,24 +678,8 @@ export const MOCK_EVENTS_DETAIL = [
     ],
   },
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+  //                 FEMALE  (id: 13–18)                    
   
-
-  // ╔══════════════════════════════════════════════════════════╗
-  // ║                  FEMALE  (id: 13–18)                    ║
-  // ╚══════════════════════════════════════════════════════════╝
 
   {
     id: 13,
@@ -1011,9 +994,9 @@ export const MOCK_EVENTS_DETAIL = [
     ],
   },
 
-  // ╔══════════════════════════════════════════════════════════╗
-  // ║                 COMBINED  (id: 19–24)                   ║
-  // ╚══════════════════════════════════════════════════════════╝
+  
+  //              COMBINED  (id: 19–24)                   
+  
 
   {
     id: 19,
@@ -1329,11 +1312,12 @@ export const MOCK_EVENTS_DETAIL = [
   },
 ];
 
+
 // ── Get a single event by id (used by EventDetail page) ─────────
 export const getEventById = (id) =>
   MOCK_EVENTS_DETAIL.find((e) => e.id === Number(id)) || null;
 
-// ── Get all events for a community page ─────────────────────────
+// ── Get all events for a community page ────────────────────
 // Usage: const events = getEventsByCommunity("Male");
 export const getEventsByCommunity = (community) =>
   MOCK_EVENTS_DETAIL.filter((e) => e.community === community);
