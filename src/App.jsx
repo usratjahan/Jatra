@@ -13,9 +13,9 @@ const UserLayout = () => (
 );
 const App = () => {
   return (
-    <BrowserRouter></BrowserRouter>
+    <BrowserRouter>
      <Routes>
-                <Route element={<UserLayout />}>
+          <Route element={<UserLayout />}>
             <Route path="/" element={<Home />} />
 </Route>
         </Routes>
