@@ -11,4 +11,15 @@ const UserLayout = () => (
     <Footer />
   </>
 );
-
+const App = () => {
+  return (
+    <BrowserRouter></BrowserRouter>
+     <Routes>
+                <Route element={<UserLayout />}>
+            <Route path="/" element={<Home />} />
+</Route>
+        </Routes>
+        </BrowserRouter>
+  );
+  };
+export default App;
