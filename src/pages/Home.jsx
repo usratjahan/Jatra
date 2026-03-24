@@ -258,10 +258,97 @@ const Home = () => {
             </h1>
           )}
         </div>
-        
+         <div
+          className="relative z-10 w-full"
+          style={{ padding: "0 20px 60px" }}
+        >
+          {loaded && (
+            <div
+              className="fade-up d4 text-center"
+              style={{ marginBottom: 24 }}
+            >
+              <span
+                style={{
+                  color: "rgba(200,210,200,0.7)",
+                  fontSize: 12,
+                  fontWeight: 600,
+                  letterSpacing: "0.18em",
+                  textTransform: "uppercase",
+                }}
+              >
+                Choose Your Community
+              </span>
+              <div
+                style={{
+                  marginTop: 8,
+                  marginLeft: "auto",
+                  marginRight: "auto",
+                  width: 48,
+                  height: 2,
+                  borderRadius: 2,
+                  background: "linear-gradient(to right, #22c55e, transparent)",
+                }}
+              />
+            </div>
+          )}
+          {loaded && communitiesData ? (
+            <div
+              style={{ maxWidth: 1280, margin: "0 auto", overflow: "hidden" }}
+            >
+              <div className="cards-stack">
+                {communitiesData.map((comm, i) => {
+                  const lefts = ["1%", "24%", "47%", "71%"];
+                  const tops = ["3%", "18%", "10%", "3%"];
+                  const tilts = [
+                    "rotate(-2deg)",
+                    "rotate(1deg)",
+                    "rotate(-1deg)",
+                    "rotate(1deg)",
+                  ];
+
+                  return (
+                    <div
+                      key={comm.id}
+                      className={`card-wrap cw${i + 1}`}
+                      style={{
+                        position: isDesktop ? "absolute" : "relative",
+                        zIndex: activeCardId === comm.id ? 100 : 10 + i,
+                        width: isDesktop ? "clamp(220px, 24vw, 360px)" : "100%",
+                        height: 360,
+                        left: isDesktop ? lefts[i] : "auto",
+                        top: isDesktop ? tops[i] : "auto",
+                        transform: isDesktop ? tilts[i] : "none",
+                      }}
+                    >
+                      <CommunityCard
+                        comm={comm}
+                        onHoverStart={() => setActiveCardId(comm.id)}
+                        onHoverEnd={() =>
+                          setActiveCardId((prev) =>
+                            prev === comm.id ? null : prev,
+                          )
+                        }
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ) : (
+            <div
+              style={{ maxWidth: 1300, margin: "0 auto", overflow: "hidden" }}
+            >
+              <div className="cards-stack">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="skeleton" />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </section>
     </div>
-
   );
 };
+
 export default Home;
