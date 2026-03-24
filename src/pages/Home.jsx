@@ -173,32 +173,91 @@ const Home = () => {
   }, []);
  
   return (
-    <div style={{ fontFamily: "'DM Sans', sans-serif", background: "#050508", minHeight: "100vh" }}>
-      <section className="relative flex flex-col" style={{ minHeight: "100vh" }}>
-        <div className="absolute inset-0 overflow-hidden">
+    <div
+     style={{
+       fontFamily: "'DM Sans', sans-serif",
+        background: "#050508", 
+        minHeight: "100vh" }}
+        
+        >
+      <section
+       className="relative flex flex-col"
+        style={{
+           minHeight: "100vh" }}
+           >
+        <div 
+        className="absolute inset-0 overflow-hidden"
+        >
           {heroData ? (
-            <img src={heroData.background_image} alt="Hero background" className="fade-in"
-              style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }}
+            <img
+             src={heroData.background_image}
+              alt="Hero background" 
+              className="fade-in"
+              style={{
+                 width: "100%",
+                  height: "100%",
+                   objectFit: "cover",
+                    objectPosition: "center" }}
             />
           ) : (
-            <div style={{ width: "100%", height: "100%", background: "#0a0f0a" }} />
+            <div
+             style={{
+               width: "100%",
+                height: "100%",
+                 background: "#0a0f0a" }}
+                  />
           )}
-          <div className="absolute inset-0"
+
+
+          <div className="absolute top-0 left-0 w-full overflow-hidden pointer-events-none z-[2]">
+            <div className="animate-moveCloud">
+              <img
+                src={Cloud2}
+                alt="cloud"
+                className="w-[700px] opacity-80"
+              />
+            </div>
+          </div>
+          <div className="absolute top-24 left-0 w-full overflow-hidden pointer-events-none z-[2] opacity-70">
+            <div className="animate-moveCloudFast">
+              <img
+                src={Cloud1}
+                alt="cloud"
+                className="w-[600px]"
+              />
+            </div>
+          </div>
+
+          <div
+           className="absolute inset-0"
             style={{
               background: "linear-gradient(to bottom, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.15) 40%, rgba(5,5,8,0.70) 72%, rgba(5,5,8,0.97) 100%)",
             }}
           />
         </div>
+        
  
-        <div className="relative z-10 flex flex-col items-center justify-center text-center px-4"
-          style={{ flexGrow: 1, paddingTop: "120px", paddingBottom: "100px" }}>
+        <div 
+        className="relative z-10 flex flex-col items-center justify-center text-center px-4"
+          style={{
+             flexGrow: 1, 
+             paddingTop: "120px",
+              paddingBottom: "100px" }}
+              >
+                
           {loaded && heroData && (
-            <h1 className="hero-title fade-up d2 text-white"
+
+            <h1 
+            className="hero-title fade-up d2 text-white"
               style={{ fontSize: "clamp(1rem, 4vw, 3rem)",
-               marginBottom: "24px" }}>
+               marginBottom: "24px" 
+               }}
+               >
+
               {heroData.title_line1}
             </h1>
           )}
+
         </div>
       </section>
     </div>
