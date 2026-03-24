@@ -199,6 +199,38 @@ const PriceRangeSlider = ({ min, max, value, onChange }) => {
     </div>
   );
 };
+
+
+
+                        // EVENT CARD 
+// ═══════════════════════════════════════════════════════════
+const EventCard = ({ event }) => {
+  const navigate = useNavigate();
+
+  const openDetails = () => {
+    navigate(`/events/${event.id}`);
+  };
+
+  return (
+    // Outer teal border card — exactly like Figma screenshot
+    <div
+      className="bg-[#0F393E] cursor-pointer rounded-[1.35rem] p-2 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl sm:rounded-3xl sm:p-[12px]"
+      role="button"
+      tabIndex={0}
+      onClick={openDetails}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          openDetails();
+        }
+      }}
+      aria-label={`Open details for ${event.title}`}
+    >
+      <div className="overflow-hidden rounded-[18px] bg-white sm:rounded-[22px]">
+      </div>
+    </div>
+  );
+};
 const Events = () => {
   return (
     <div className="relative bg-[#edfffd] min-h-screen pt-24 pb-16">
