@@ -249,18 +249,19 @@ const Home = () => {
 
             <h1 
             className="hero-title fade-up d2 text-white"
-              style={{ fontSize: "clamp(1rem, 4vw, 3rem)",
+              style={{
+                 fontSize: "clamp(1rem, 4vw, 3rem)",
                marginBottom: "24px" 
                }}
                >
-
               {heroData.title_line1}
             </h1>
           )}
-
         </div>
+        
       </section>
     </div>
+
   );
 };
 export default Home;
