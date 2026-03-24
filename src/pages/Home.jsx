@@ -96,8 +96,41 @@ const CommunityCard = ({ comm, onHoverStart, onHoverEnd }) => {
               style={{ color: comm.theme.badge_text }}>
               {comm.subtitle}
             </p>
-            <h3 className="text-white font-black text-2xl leading-tight">{comm.title}</h3>
-            <p className="text-gray-200/90 text-sm leading-relaxed mt-2">{comm.description}</p>
+            <h3 className="text-white font-black text-2xl leading-tight">
+              {comm.title}
+              </h3>
+            <p className="text-gray-200/90 text-sm leading-relaxed mt-2">
+            {comm.description}
+            </p>
+           
+            {/* mini bottom bar */}
+            <div
+              className="mt-4 rounded-2xl border border-white/15 backdrop-blur px-4 py-3 flex items-center gap-3"
+              style={{ background: "rgba(255,255,255,0.10)" }}
+            >
+              <div className="flex-1">
+                <p className="text-white/60 text-[10px]">Members</p>
+                <p className="text-white text-sm font-bold">
+                  {comm.member_count}
+                  </p>
+              </div>
+              <div className="w-px h-8 bg-white/15 hidden sm:block" />
+              <div className="hidden sm:block flex-1">
+                <p className="text-white/60 text-[10px]">Type</p>
+                <p className="text-white text-sm font-bold">
+                  {comm.title}
+                  </p>
+              </div>
+              <div
+                className="ml-auto h-10 w-10 rounded-xl font-black text-white grid place-items-center"
+                style={{
+                  background: `linear-gradient(135deg, ${comm.theme.accent_color}, rgba(255,255,255,0.18))`,
+                }}
+              >
+                Go
+              </div>
+            </div>
+
             <div className="mt-4 flex items-center gap-2 text-sm font-extrabold"
               style={{ color: comm.theme.badge_text }}>
               <span>Join Community</span>
