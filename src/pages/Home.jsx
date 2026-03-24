@@ -146,11 +146,62 @@ const CommunityCard = ({ comm, onHoverStart, onHoverEnd }) => {
 };
  
 const Home = () => {
+  const [heroData, setHeroData] = useState(null);
+  const [communitiesData, setCommunitiesData] = useState(null);
+  const [loaded, setLoaded] = useState(false);
+  const [activeCardId, setActiveCardId] = useState(null);
+ 
+  // for stacked layout responsiveness
+  const [isDesktop, setIsDesktop] = useState(() =>
+    typeof window !== "undefined" ? window.innerWidth > 1024 : true,
+  );
+ 
+  useEffect(() => {
+    const onResize = () => setIsDesktop(window.innerWidth > 1024);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+ 
+  useEffect(() => {
+    Promise.all([fetchHeroData(), fetchCommunitiesData()]).then(
+      ([hero, communities]) => {
+        setHeroData(hero);
+        setCommunitiesData(communities);
+        setTimeout(() => setLoaded(true), 80);
+      },
+    );
+  }, []);
+ 
   return (
-    <div style={{ background: "#050508", minHeight: "100vh" }}>
-      <p style={{ color: "white", padding: "40px" }}>Home page loading...</p>
+    <div style={{ fontFamily: "'DM Sans', sans-serif", background: "#050508", minHeight: "100vh" }}>
+      <section className="relative flex flex-col" style={{ minHeight: "100vh" }}>
+        <div className="absolute inset-0 overflow-hidden">
+          {heroData ? (
+            <img src={heroData.background_image} alt="Hero background" className="fade-in"
+              style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }}
+            />
+          ) : (
+            <div style={{ width: "100%", height: "100%", background: "#0a0f0a" }} />
+          )}
+          <div className="absolute inset-0"
+            style={{
+              background: "linear-gradient(to bottom, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.15) 40%, rgba(5,5,8,0.70) 72%, rgba(5,5,8,0.97) 100%)",
+            }}
+          />
+        </div>
+ 
+        <div className="relative z-10 flex flex-col items-center justify-center text-center px-4"
+          style={{ flexGrow: 1, paddingTop: "120px", paddingBottom: "100px" }}>
+          {loaded && heroData && (
+            <h1 className="hero-title fade-up d2 text-white"
+              style={{ fontSize: "clamp(1rem, 4vw, 3rem)",
+               marginBottom: "24px" }}>
+              {heroData.title_line1}
+            </h1>
+          )}
+        </div>
+      </section>
     </div>
   );
 };
- 
 export default Home;
