@@ -602,14 +602,18 @@ return (
           </div>
         </div>
         <div className="flex flex-col lg:flex-row gap-6 items-start">
+         
           {/* ════════════════════════════
               LEFT SIDEBAR
           ════════════════════════════ */}
+
           <aside className="w-full lg:w-72 xl:w-80 flex-shrink-0">
             <div className="lg:sticky lg:top-24 bg-[#cee2e5] backdrop-blur-md rounded-3xl shadow-lg overflow-hidden">
               <div className="h-1.5 bg-gradient-to-r from-teal-500 to-emerald-400" />
               <div className="p-5 space-y-5">
+
                 {/* Header */}
+
                 <div className="flex items-center gap-2.5 pb-3 border-b border-gray-100">
                   <div className="w-8 h-8 bg-teal-600 rounded-xl flex items-center justify-center flex-shrink-0">
                     <svg
@@ -628,6 +632,23 @@ return (
                   </div>
                   <span className="font-bold text-gray-800">Filter Events</span>
                 </div>
+
+                 {/* ── PRICE RANGE FILTER ── */}
+                
+                <div>
+                  <label className={labelCls}>Filter Price (BDT)</label>
+                  <div className="bg-white border border-gray-200 rounded-2xl p-4">
+                    <PriceRangeSlider
+                      min={PRICE_MIN}
+                      max={PRICE_MAX}
+                      value={priceRange}
+                      onChange={setPriceRange}
+                    />
+                  </div>
+                </div>
+                </div>
+                </aside>
+
                 <div className="flex-1 min-w-0">
             <p className="text-teal-700 font-bold">
               {loading ? "Loading..." : `${filtered.length} events`}
