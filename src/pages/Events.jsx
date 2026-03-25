@@ -957,7 +957,11 @@ const Events = () => {
               </div>
             </div>
           </aside>
-{/* ════════════════════════════
+
+
+          
+
+          {/* ════════════════════════════
               RIGHT — EVENTS
           ════════════════════════════ */}
           <div className="flex-1 min-w-0">
@@ -1021,7 +1025,7 @@ const Events = () => {
               </div>
             </div>
 
-              {/* Cards */}
+            {/* Cards */}
             {loading ? (
               <div className="grid grid-cols-2 gap-3 sm:gap-6">
                 {[1, 2, 3, 4].map((n) => (
@@ -1039,10 +1043,77 @@ const Events = () => {
                   </div>
                 ))}
               </div>
-               )}
+            ) : filtered.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-32 text-center bg-white/60 backdrop-blur-sm rounded-3xl">
+                <div className="text-7xl mb-4"><Search /></div>
+                <h3 className="text-xl font-bold text-gray-700 mb-2">
+                  No events found
+                </h3>
+                <p className="text-gray-400 text-sm mb-6">
+                  Try adjusting your filters
+                </p>
+                <button
+                  onClick={resetFilters}
+                  className="px-6 py-2.5 bg-teal-600 text-white rounded-full text-sm font-semibold hover:bg-teal-500 transition-colors"
+                >
+                  Clear Filters
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="grid grid-cols-2 gap-3 sm:gap-6">
+                  {paginatedEvents.map((event) => (
+                    <EventCard key={event.id} event={event} />
+                  ))}
+                </div>
+
+                {filtered.length > EVENTS_PER_PAGE && (
+                  <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
+                    <button
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.max(1, prev - 1))
+                      }
+                      disabled={currentPage === 1}
+                      className="px-3 py-2 rounded-xl border border-gray-200 text-sm font-semibold text-gray-600 bg-white hover:border-teal-500 hover:text-teal-700 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      Prev
+                    </button>
+
+                    {Array.from({ length: totalPages }, (_, index) => {
+                      const page = index + 1;
+                      return (
+                        <button
+                          key={page}
+                          onClick={() => setCurrentPage(page)}
+                          className={`px-3.5 py-2 rounded-xl border text-sm font-bold transition-colors ${
+                            currentPage === page
+                              ? "bg-teal-700 text-white border-teal-700"
+                              : "bg-white text-gray-700 border-gray-200 hover:border-teal-500 hover:text-teal-700"
+                          }`}
+                        >
+                          {page}
+                        </button>
+                      );
+                    })}
+
+                    <button
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+                      }
+                      disabled={currentPage === totalPages}
+                      className="px-3 py-2 rounded-xl border border-gray-200 text-sm font-semibold text-gray-600 bg-white hover:border-teal-500 hover:text-teal-700 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      Next
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
         </div>
       </div>
     </div>
   );
- 
+};
+
 export default Events;
