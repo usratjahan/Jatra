@@ -646,6 +646,51 @@ return (
                     />
                   </div>
                 </div>
+                
+                {/* ── DIVISIONS OF BANGLADESH (checkboxes) ── */}
+                <div>
+                  <label className={labelCls}>Division</label>
+                  <div className="space-y-2">
+                    {/* TODO: fetch from GET /api/divisions */}
+                    {MOCK_DIVISIONS.map((div) => (
+                      <button
+                        key={div.id}
+                        onClick={() => toggleDivision(div.name)}
+                        className="w-full flex items-center gap-3 group py-0.5"
+                      >
+                        <div
+                          className={`w-5 h-5 rounded-md flex items-center justify-center border-2 flex-shrink-0 transition-all
+                          ${
+                            selectedDivisions.includes(div.name)
+                              ? "bg-teal-600 border-teal-600"
+                              : "border-gray-300 group-hover:border-teal-400"
+                          }`}
+                        >
+                          {selectedDivisions.includes(div.name) && (
+                            <svg
+                              className="w-3 h-3 text-white"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={3}
+                                d="M5 13l4 4L19 7"
+                              />
+                            </svg>
+                          )}
+                        </div>
+                        <span
+                          className={`text-sm text-left transition-colors ${selectedDivisions.includes(div.name) ? "text-teal-700 font-medium" : "text-gray-600 group-hover:text-gray-900"}`}
+                        >
+                          {div.name}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
                 </div>
                 </aside>
 
