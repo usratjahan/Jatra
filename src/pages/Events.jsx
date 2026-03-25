@@ -571,14 +571,28 @@ const Events = () => {
   
 
 return (
-    <div className="relative bg-[#edfffd] min-h-screen pt-24 pb-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <p className="text-teal-700 font-bold text-xl">
-          {loading ? "Loading events..." : `${events.length} events loaded`}
+    <div className="relative bg-[#edfffd] min-h-screen pt-24 pb-16 overflow-hidden">
+      <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0" />
+      </div>
+ 
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Page header with travel image */}
+        <div className="mb-10 text-center">
+          <div className="flex justify-center">
+            <img
+              src={travelHeader}
+              alt="Travel"
+              className="max-w-[1200px] h-auto object-contain drop-shadow-md"
+            />
+          </div>
+        </div>
+ 
+        <p className="text-teal-700 font-bold">
+          {loading ? "Loading..." : `${filtered.length} events`}
         </p>
       </div>
     </div>
   );
-};
  
 export default Events;
