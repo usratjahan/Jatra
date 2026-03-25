@@ -438,6 +438,138 @@ const Events = () => {
     })();
   }, []);
 
+  // ── Division helpers ──
+    const toggleDivision = (name) =>
+      setSelectedDivisions((p) =>
+        p.includes(name) ? p.filter((d) => d !== name) : [...p, name],
+      );
+  
+    const toggleCommunity = (name) =>
+      setSelectedCommunities((p) =>
+        p.includes(name) ? p.filter((c) => c !== name) : [...p, name],
+      );
+  
+    const removeDivision = (name) =>
+      setSelectedDivisions((p) => p.filter((d) => d !== name));
+  
+    // ── City helpers ──
+    const filteredCities = MOCK_CITIES.filter((c) =>
+      c.name.toLowerCase().includes(citySearch.toLowerCase()),
+    );
+    const visibleCities = showAllCities
+      ? filteredCities
+      : filteredCities.slice(0, 6);
+    const toggleCity = (name) =>
+      setSelectedCities((p) =>
+        p.includes(name) ? p.filter((c) => c !== name) : [...p, name],
+      );
+  
+    const runAllFilters = useCallback(
+      (sourceEvents) => {
+        let result = [...sourceEvents];
+  
+        if (selectedDivisions.length > 0) {
+          result = result.filter((e) => selectedDivisions.includes(e.division));
+        }
+  
+        if (selectedCommunities.length > 0) {
+          result = result.filter((e) =>
+            selectedCommunities.includes(e.community),
+          );
+        }
+  
+        if (date) {
+          const selectedDate = new Date(date);
+          result = result.filter((e) =>
+            isSelectedDateWithinEventRange(selectedDate, e.dateFrom, e.dateTo),
+          );
+        }
+  
+        if (travelers > 1) {
+          result = result.filter((e) => e.spotsLeft >= travelers);
+        }
+  
+        if (selectedCities.length > 0) {
+          result = result.filter((e) =>
+            selectedCities.some((city) => {
+              const cityName = city.toLowerCase();
+              const location = e.location?.toLowerCase() ?? "";
+              const sublocation = e.sublocation?.toLowerCase() ?? "";
+              return (
+                location.includes(cityName) ||
+                sublocation.includes(cityName) ||
+                cityName.includes(location) ||
+                cityName.includes(sublocation)
+              );
+            }),
+          );
+        }
+  
+        result = result.filter(
+          (e) => e.price >= priceRange[0] && e.price <= priceRange[1],
+        );
+  
+        return result;
+      },
+      [
+        selectedDivisions,
+        selectedCommunities,
+        date,
+        travelers,
+        selectedCities,
+        priceRange,
+      ],
+    );
+  
+    // ── Apply filters ──
+    const applyFilters = () => {
+      // Kept for manual button trigger, while filters also auto-update below.
+      setFiltered(runAllFilters(events));
+      setCurrentPage(1);
+    };
+  
+    useEffect(() => {
+      setFiltered(runAllFilters(events));
+      setCurrentPage(1);
+    }, [events, runAllFilters]);
+  
+    // ── Reset ──
+    const resetFilters = () => {
+      setSelectedDivisions([]);
+      setSelectedCommunities([]);
+      setDate("");
+      setTravelers(2);
+      setCitySearch("");
+      setSelectedCities([]);
+      setPriceRange([PRICE_MIN, PRICE_MAX]);
+      setCurrentPage(1);
+    };
+  
+    const hasActiveFilters =
+      selectedDivisions.length > 0 ||
+      selectedCommunities.length > 0 ||
+      Boolean(date) ||
+      travelers > 1 ||
+      selectedCities.length > 0 ||
+      priceRange[0] > PRICE_MIN ||
+      priceRange[1] < PRICE_MAX;
+  
+    const totalPages = Math.max(1, Math.ceil(filtered.length / EVENTS_PER_PAGE));
+    const paginatedEvents = filtered.slice(
+      (currentPage - 1) * EVENTS_PER_PAGE,
+      currentPage * EVENTS_PER_PAGE,
+    );
+  
+    useEffect(() => {
+      setCurrentPage((prev) => Math.min(prev, totalPages));
+    }, [totalPages]);
+  
+    const inputCls =
+      "w-full bg-white border border-gray-200 rounded-2xl px-4 py-3 text-sm text-gray-700 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-colors";
+    const labelCls =
+      "block text-teal-700 font-semibold text-xs uppercase tracking-wider mb-1.5 px-1";
+  
+
 return (
     <div className="relative bg-[#edfffd] min-h-screen pt-24 pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
