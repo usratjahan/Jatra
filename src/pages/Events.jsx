@@ -837,6 +837,39 @@ return (
                     </div>
                   </div>
                 </div>
+
+         {/* ── APPLY BUTTON ── */}
+                <button
+                  onClick={applyFilters}
+                  className="w-full py-3.5 bg-teal-700 hover:bg-teal-600 text-white font-bold rounded-2xl transition-all duration-200 hover:shadow-lg hover:shadow-teal-700/30 active:scale-95 flex items-center justify-center gap-2 text-sm tracking-wide"
+                >
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                  Apply Filters
+                </button>
+
+                {hasActiveFilters && (
+                  <button
+                    onClick={resetFilters}
+                    className="w-full py-2 text-xs text-gray-400 hover:text-teal-600 transition-colors font-medium"
+                  >
+                    ✕ Reset all filters
+                  </button>
+                )}
+
+
+
                 <div className="flex-1 min-w-0">
             <p className="text-teal-700 font-bold">
               {loading ? "Loading..." : `${filtered.length} events`}
