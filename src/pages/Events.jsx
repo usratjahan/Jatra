@@ -572,13 +572,27 @@ const Events = () => {
 
 return (
     <div className="relative bg-[#edfffd] min-h-screen pt-24 pb-16 overflow-hidden">
+      {/* ── BACKGROUND ── */}
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0" />
+        <div className="absolute inset-0 opacity-[0.12]" />
+        {/* <div className="absolute top-20 left-10 w-72 h-72 bg-teal-300/20 rounded-full blur-3xl"/>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-cyan-300/20 rounded-full blur-3xl"/> */}
       </div>
- 
+
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Page header with travel image */}
+        {/* Page header */}
         <div className="mb-10 text-center">
+          {/* <p className="text-teal-600 font-semibold text-sm uppercase tracking-widest mb-2">
+            Discover & Book
+          </p> */}
+          {/* <h1 className="text-4xl sm:text-5xl font-bold text-gray-800 mb-3">
+            Explore Events
+          </h1>
+          <p className="text-gray-500 text-base max-w-md mx-auto">
+            Find the perfect travel experience across Bangladesh
+          </p> */}
+          {/* Travel sticker image — below the heading text */}
           <div className="flex justify-center">
             <img
               src={travelHeader}
@@ -587,10 +601,39 @@ return (
             />
           </div>
         </div>
- 
-        <p className="text-teal-700 font-bold">
-          {loading ? "Loading..." : `${filtered.length} events`}
-        </p>
+        <div className="flex flex-col lg:flex-row gap-6 items-start">
+          {/* ════════════════════════════
+              LEFT SIDEBAR
+          ════════════════════════════ */}
+          <aside className="w-full lg:w-72 xl:w-80 flex-shrink-0">
+            <div className="lg:sticky lg:top-24 bg-[#cee2e5] backdrop-blur-md rounded-3xl shadow-lg overflow-hidden">
+              <div className="h-1.5 bg-gradient-to-r from-teal-500 to-emerald-400" />
+              <div className="p-5 space-y-5">
+                {/* Header */}
+                <div className="flex items-center gap-2.5 pb-3 border-b border-gray-100">
+                  <div className="w-8 h-8 bg-teal-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <svg
+                      className="w-4 h-4 text-white"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"
+                      />
+                    </svg>
+                  </div>
+                  <span className="font-bold text-gray-800">Filter Events</span>
+                </div>
+                <div className="flex-1 min-w-0">
+            <p className="text-teal-700 font-bold">
+              {loading ? "Loading..." : `${filtered.length} events`}
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
