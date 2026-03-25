@@ -4,6 +4,8 @@ import "./App.css";
 import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
 import Home from "./pages/Home";
+import Events from "./pages/Events";
+
 const UserLayout = () => (
   <>
     <Navbar />
@@ -17,6 +19,8 @@ const App = () => {
      <Routes>
           <Route element={<UserLayout />}>
             <Route path="/" element={<Home />} />
+              <Route path="/events" element={<Events />} />
+
 </Route>
         </Routes>
         </BrowserRouter>
