@@ -385,11 +385,65 @@ const DivisionSummaryCard = ({ divisions, onRemove }) => {
 };
 
 
+//═══════════════════════════════════════════════════════════
+// EVENTS PAGE
+// ═══════════════════════════════════════════════════════════
 const Events = () => {
-  return (
+  const [selectedCommunities, setSelectedCommunities] = useState([]);
+  const [date, setDate] = useState("");
+  const [travelers, setTravelers] = useState(2);
+  const [citySearch, setCitySearch] = useState("");
+  const [selectedCities, setSelectedCities] = useState([]);
+  const [showAllCities, setShowAllCities] = useState(false);
+
+  // Divisions (replaces old location dropdown)
+  const [selectedDivisions, setSelectedDivisions] = useState([]);
+
+  // Price range
+  const [priceRange, setPriceRange] = useState([PRICE_MIN, PRICE_MAX]);
+
+  const [events, setEvents] = useState([]);
+  const [filtered, setFiltered] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // ── Initial fetch ──
+  useEffect(() => {
+    (async () => {
+      try {
+        setLoading(true);
+        // TODO: const res = await fetch('/api/events'); const data = await res.json(); setEvents(data); setFiltered(data);
+        const raw = await getAdminEvents();
+        const mapped = raw.map((e) => ({
+          id: e.id,
+          title: e.title,
+          location: e.location,
+          sublocation: e.sublocation,
+          price: e.price,
+          dateFrom: e.dateFrom,
+          dateTo: e.dateTo,
+          spotsLeft: e.spotsLeft,
+          rating: e.rating ?? e.avgRating ?? 5.0,
+          image: e.image,
+          community: e.community,
+          division: e.division,
+        }));
+        setEvents(mapped);
+        setFiltered(mapped);
+      } catch (err) {
+        console.error("Fetch events failed:", err);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+return (
     <div className="relative bg-[#edfffd] min-h-screen pt-24 pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <p className="text-teal-700 font-bold text-xl">Events page coming soon...</p>
+        <p className="text-teal-700 font-bold text-xl">
+          {loading ? "Loading events..." : `${events.length} events loaded`}
+        </p>
       </div>
     </div>
   );
