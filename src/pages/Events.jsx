@@ -262,7 +262,8 @@ const EventCard = ({ event }) => {
           </span>
         </div>
       </div>
-       {/* ── CARD BODY ── */}
+
+      {/* ── CARD BODY ── */}
       <div className="px-3 pb-3 pt-1.5 sm:px-4 sm:pb-4 sm:pt-2">
         {/* Location — two lines: city bold, sublocation smaller */}
         <div className="mb-2.5 flex items-start gap-1.5 sm:mb-3 sm:gap-2">
@@ -357,6 +358,10 @@ const EventCard = ({ event }) => {
     </div>
   );
 };
+
+
+// SELECTED DIVISION SUMMARY CARD (right panel top)
+// ═══════════════════════════════════════════════════════════
 const DivisionSummaryCard = ({ divisions, onRemove }) => {
   if (!divisions.length) return null;
   return (
@@ -384,8 +389,7 @@ const DivisionSummaryCard = ({ divisions, onRemove }) => {
   );
 };
 
-
-//═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 // EVENTS PAGE
 // ═══════════════════════════════════════════════════════════
 const Events = () => {
@@ -439,138 +443,137 @@ const Events = () => {
   }, []);
 
   // ── Division helpers ──
-    const toggleDivision = (name) =>
-      setSelectedDivisions((p) =>
-        p.includes(name) ? p.filter((d) => d !== name) : [...p, name],
-      );
-  
-    const toggleCommunity = (name) =>
-      setSelectedCommunities((p) =>
-        p.includes(name) ? p.filter((c) => c !== name) : [...p, name],
-      );
-  
-    const removeDivision = (name) =>
-      setSelectedDivisions((p) => p.filter((d) => d !== name));
-  
-    // ── City helpers ──
-    const filteredCities = MOCK_CITIES.filter((c) =>
-      c.name.toLowerCase().includes(citySearch.toLowerCase()),
+  const toggleDivision = (name) =>
+    setSelectedDivisions((p) =>
+      p.includes(name) ? p.filter((d) => d !== name) : [...p, name],
     );
-    const visibleCities = showAllCities
-      ? filteredCities
-      : filteredCities.slice(0, 6);
-    const toggleCity = (name) =>
-      setSelectedCities((p) =>
-        p.includes(name) ? p.filter((c) => c !== name) : [...p, name],
-      );
-  
-    const runAllFilters = useCallback(
-      (sourceEvents) => {
-        let result = [...sourceEvents];
-  
-        if (selectedDivisions.length > 0) {
-          result = result.filter((e) => selectedDivisions.includes(e.division));
-        }
-  
-        if (selectedCommunities.length > 0) {
-          result = result.filter((e) =>
-            selectedCommunities.includes(e.community),
-          );
-        }
-  
-        if (date) {
-          const selectedDate = new Date(date);
-          result = result.filter((e) =>
-            isSelectedDateWithinEventRange(selectedDate, e.dateFrom, e.dateTo),
-          );
-        }
-  
-        if (travelers > 1) {
-          result = result.filter((e) => e.spotsLeft >= travelers);
-        }
-  
-        if (selectedCities.length > 0) {
-          result = result.filter((e) =>
-            selectedCities.some((city) => {
-              const cityName = city.toLowerCase();
-              const location = e.location?.toLowerCase() ?? "";
-              const sublocation = e.sublocation?.toLowerCase() ?? "";
-              return (
-                location.includes(cityName) ||
-                sublocation.includes(cityName) ||
-                cityName.includes(location) ||
-                cityName.includes(sublocation)
-              );
-            }),
-          );
-        }
-  
-        result = result.filter(
-          (e) => e.price >= priceRange[0] && e.price <= priceRange[1],
-        );
-  
-        return result;
-      },
-      [
-        selectedDivisions,
-        selectedCommunities,
-        date,
-        travelers,
-        selectedCities,
-        priceRange,
-      ],
-    );
-  
-    // ── Apply filters ──
-    const applyFilters = () => {
-      // Kept for manual button trigger, while filters also auto-update below.
-      setFiltered(runAllFilters(events));
-      setCurrentPage(1);
-    };
-  
-    useEffect(() => {
-      setFiltered(runAllFilters(events));
-      setCurrentPage(1);
-    }, [events, runAllFilters]);
-  
-    // ── Reset ──
-    const resetFilters = () => {
-      setSelectedDivisions([]);
-      setSelectedCommunities([]);
-      setDate("");
-      setTravelers(2);
-      setCitySearch("");
-      setSelectedCities([]);
-      setPriceRange([PRICE_MIN, PRICE_MAX]);
-      setCurrentPage(1);
-    };
-  
-    const hasActiveFilters =
-      selectedDivisions.length > 0 ||
-      selectedCommunities.length > 0 ||
-      Boolean(date) ||
-      travelers > 1 ||
-      selectedCities.length > 0 ||
-      priceRange[0] > PRICE_MIN ||
-      priceRange[1] < PRICE_MAX;
-  
-    const totalPages = Math.max(1, Math.ceil(filtered.length / EVENTS_PER_PAGE));
-    const paginatedEvents = filtered.slice(
-      (currentPage - 1) * EVENTS_PER_PAGE,
-      currentPage * EVENTS_PER_PAGE,
-    );
-  
-    useEffect(() => {
-      setCurrentPage((prev) => Math.min(prev, totalPages));
-    }, [totalPages]);
-  
-    const inputCls =
-      "w-full bg-white border border-gray-200 rounded-2xl px-4 py-3 text-sm text-gray-700 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-colors";
-    const labelCls =
-      "block text-teal-700 font-semibold text-xs uppercase tracking-wider mb-1.5 px-1";
-  
 
-return (
+  const toggleCommunity = (name) =>
+    setSelectedCommunities((p) =>
+      p.includes(name) ? p.filter((c) => c !== name) : [...p, name],
+    );
+
+  const removeDivision = (name) =>
+    setSelectedDivisions((p) => p.filter((d) => d !== name));
+
+  // ── City helpers ──
+  const filteredCities = MOCK_CITIES.filter((c) =>
+    c.name.toLowerCase().includes(citySearch.toLowerCase()),
+  );
+  const visibleCities = showAllCities
+    ? filteredCities
+    : filteredCities.slice(0, 6);
+  const toggleCity = (name) =>
+    setSelectedCities((p) =>
+      p.includes(name) ? p.filter((c) => c !== name) : [...p, name],
+    );
+
+  const runAllFilters = useCallback(
+    (sourceEvents) => {
+      let result = [...sourceEvents];
+
+      if (selectedDivisions.length > 0) {
+        result = result.filter((e) => selectedDivisions.includes(e.division));
+      }
+
+      if (selectedCommunities.length > 0) {
+        result = result.filter((e) =>
+          selectedCommunities.includes(e.community),
+        );
+      }
+
+      if (date) {
+        const selectedDate = new Date(date);
+        result = result.filter((e) =>
+          isSelectedDateWithinEventRange(selectedDate, e.dateFrom, e.dateTo),
+        );
+      }
+
+      if (travelers > 1) {
+        result = result.filter((e) => e.spotsLeft >= travelers);
+      }
+
+      if (selectedCities.length > 0) {
+        result = result.filter((e) =>
+          selectedCities.some((city) => {
+            const cityName = city.toLowerCase();
+            const location = e.location?.toLowerCase() ?? "";
+            const sublocation = e.sublocation?.toLowerCase() ?? "";
+            return (
+              location.includes(cityName) ||
+              sublocation.includes(cityName) ||
+              cityName.includes(location) ||
+              cityName.includes(sublocation)
+            );
+          }),
+        );
+      }
+
+      result = result.filter(
+        (e) => e.price >= priceRange[0] && e.price <= priceRange[1],
+      );
+
+      return result;
+    },
+    [
+      selectedDivisions,
+      selectedCommunities,
+      date,
+      travelers,
+      selectedCities,
+      priceRange,
+    ],
+  );
+
+  // ── Apply filters ──
+  const applyFilters = () => {
+    // Kept for manual button trigger, while filters also auto-update below.
+    setFiltered(runAllFilters(events));
+    setCurrentPage(1);
+  };
+
+  useEffect(() => {
+    setFiltered(runAllFilters(events));
+    setCurrentPage(1);
+  }, [events, runAllFilters]);
+
+  // ── Reset ──
+  const resetFilters = () => {
+    setSelectedDivisions([]);
+    setSelectedCommunities([]);
+    setDate("");
+    setTravelers(2);
+    setCitySearch("");
+    setSelectedCities([]);
+    setPriceRange([PRICE_MIN, PRICE_MAX]);
+    setCurrentPage(1);
+  };
+
+  const hasActiveFilters =
+    selectedDivisions.length > 0 ||
+    selectedCommunities.length > 0 ||
+    Boolean(date) ||
+    travelers > 1 ||
+    selectedCities.length > 0 ||
+    priceRange[0] > PRICE_MIN ||
+    priceRange[1] < PRICE_MAX;
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / EVENTS_PER_PAGE));
+  const paginatedEvents = filtered.slice(
+    (currentPage - 1) * EVENTS_PER_PAGE,
+    currentPage * EVENTS_PER_PAGE,
+  );
+
+  useEffect(() => {
+    setCurrentPage((prev) => Math.min(prev, totalPages));
+  }, [totalPages]);
+
+  const inputCls =
+    "w-full bg-white border border-gray-200 rounded-2xl px-4 py-3 text-sm text-gray-700 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-colors";
+  const labelCls =
+    "block text-teal-700 font-semibold text-xs uppercase tracking-wider mb-1.5 px-1";
+
+  return (
     <div className="relative bg-[#edfffd] min-h-screen pt-24 pb-16 overflow-hidden">
       {/* ── BACKGROUND ── */}
       <div className="absolute inset-0 z-0">
@@ -602,18 +605,14 @@ return (
           </div>
         </div>
         <div className="flex flex-col lg:flex-row gap-6 items-start">
-         
           {/* ════════════════════════════
               LEFT SIDEBAR
           ════════════════════════════ */}
-
           <aside className="w-full lg:w-72 xl:w-80 flex-shrink-0">
             <div className="lg:sticky lg:top-24 bg-[#cee2e5] backdrop-blur-md rounded-3xl shadow-lg overflow-hidden">
               <div className="h-1.5 bg-gradient-to-r from-teal-500 to-emerald-400" />
               <div className="p-5 space-y-5">
-
                 {/* Header */}
-
                 <div className="flex items-center gap-2.5 pb-3 border-b border-gray-100">
                   <div className="w-8 h-8 bg-teal-600 rounded-xl flex items-center justify-center flex-shrink-0">
                     <svg
@@ -633,8 +632,7 @@ return (
                   <span className="font-bold text-gray-800">Filter Events</span>
                 </div>
 
-                 {/* ── PRICE RANGE FILTER ── */}
-                
+                {/* ── PRICE RANGE FILTER ── */}
                 <div>
                   <label className={labelCls}>Filter Price (BDT)</label>
                   <div className="bg-white border border-gray-200 rounded-2xl p-4">
@@ -646,7 +644,7 @@ return (
                     />
                   </div>
                 </div>
-                
+
                 {/* ── DIVISIONS OF BANGLADESH (checkboxes) ── */}
                 <div>
                   <label className={labelCls}>Division</label>
@@ -691,8 +689,7 @@ return (
                     ))}
                   </div>
                 </div>
-                </div>
-                </aside>
+
                 {/* ── COMMUNITY ── */}
                 <div>
                   <label className={labelCls}>Community</label>
@@ -771,7 +768,8 @@ return (
                     ))}
                   </div>
                 </div>
-                   {/* ── DATE ── */}
+
+                {/* ── DATE ── */}
                 <div>
                   <label className={labelCls}>Date</label>
                   <input
@@ -838,7 +836,7 @@ return (
                   </div>
                 </div>
 
-         {/* ── APPLY BUTTON ── */}
+                {/* ── APPLY BUTTON ── */}
                 <button
                   onClick={applyFilters}
                   className="w-full py-3.5 bg-teal-700 hover:bg-teal-600 text-white font-bold rounded-2xl transition-all duration-200 hover:shadow-lg hover:shadow-teal-700/30 active:scale-95 flex items-center justify-center gap-2 text-sm tracking-wide"
@@ -868,7 +866,97 @@ return (
                   </button>
                 )}
 
-
+                {/* ── CITIES ── */}
+                <div className="border-t border-gray-100 pt-4">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-1 h-5 bg-yellow-400 rounded-full" />
+                    <h3 className="text-gray-800 font-bold text-sm">Cities</h3>
+                  </div>
+                  <div className="relative mb-3">
+                    <input
+                      type="text"
+                      placeholder="Search cities..."
+                      value={citySearch}
+                      onChange={(e) => setCitySearch(e.target.value)}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 pr-9 text-sm focus:outline-none focus:border-teal-500 transition-colors"
+                    />
+                    <svg
+                      className="absolute right-3 top-2.5 w-4 h-4 text-gray-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                      />
+                    </svg>
+                  </div>
+                  {/* TODO: fetch from GET /api/cities */}
+                  <div className="space-y-2">
+                    {visibleCities.map((city) => (
+                      <button
+                        key={city.id}
+                        onClick={() => toggleCity(city.name)}
+                        className="w-full flex items-center gap-3 group py-0.5"
+                      >
+                        <div
+                          className={`w-5 h-5 rounded-md flex items-center justify-center border-2 flex-shrink-0 transition-all
+                          ${selectedCities.includes(city.name) ? "bg-teal-600 border-teal-600" : "border-gray-300 group-hover:border-teal-400"}`}
+                        >
+                          {selectedCities.includes(city.name) && (
+                            <svg
+                              className="w-3 h-3 text-white"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={3}
+                                d="M5 13l4 4L19 7"
+                              />
+                            </svg>
+                          )}
+                        </div>
+                        <span
+                          className={`text-sm text-left transition-colors ${selectedCities.includes(city.name) ? "text-teal-700 font-medium" : "text-gray-600 group-hover:text-gray-900"}`}
+                        >
+                          {city.name}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                  {filteredCities.length > 6 && (
+                    <button
+                      onClick={() => setShowAllCities(!showAllCities)}
+                      className="mt-3 text-sm text-teal-600 hover:text-teal-700 font-medium flex items-center gap-1"
+                    >
+                      {showAllCities
+                        ? "Show less"
+                        : `Show more (${filteredCities.length - 6} more)`}
+                      <svg
+                        className={`w-4 h-4 transition-transform ${showAllCities ? "rotate-180" : ""}`}
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </aside>
 
                 <div className="flex-1 min-w-0">
             <p className="text-teal-700 font-bold">
