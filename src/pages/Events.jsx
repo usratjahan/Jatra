@@ -262,7 +262,8 @@ const EventCard = ({ event }) => {
           </span>
         </div>
       </div>
-       {/* ── CARD BODY ── */}
+
+      {/* ── CARD BODY ── */}
       <div className="px-3 pb-3 pt-1.5 sm:px-4 sm:pb-4 sm:pt-2">
         {/* Location — two lines: city bold, sublocation smaller */}
         <div className="mb-2.5 flex items-start gap-1.5 sm:mb-3 sm:gap-2">
@@ -357,6 +358,10 @@ const EventCard = ({ event }) => {
     </div>
   );
 };
+
+
+// SELECTED DIVISION SUMMARY CARD (right panel top)
+// ═══════════════════════════════════════════════════════════
 const DivisionSummaryCard = ({ divisions, onRemove }) => {
   if (!divisions.length) return null;
   return (
@@ -384,8 +389,7 @@ const DivisionSummaryCard = ({ divisions, onRemove }) => {
   );
 };
 
-
-//═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 // EVENTS PAGE
 // ═══════════════════════════════════════════════════════════
 const Events = () => {
@@ -439,138 +443,137 @@ const Events = () => {
   }, []);
 
   // ── Division helpers ──
-    const toggleDivision = (name) =>
-      setSelectedDivisions((p) =>
-        p.includes(name) ? p.filter((d) => d !== name) : [...p, name],
-      );
-  
-    const toggleCommunity = (name) =>
-      setSelectedCommunities((p) =>
-        p.includes(name) ? p.filter((c) => c !== name) : [...p, name],
-      );
-  
-    const removeDivision = (name) =>
-      setSelectedDivisions((p) => p.filter((d) => d !== name));
-  
-    // ── City helpers ──
-    const filteredCities = MOCK_CITIES.filter((c) =>
-      c.name.toLowerCase().includes(citySearch.toLowerCase()),
+  const toggleDivision = (name) =>
+    setSelectedDivisions((p) =>
+      p.includes(name) ? p.filter((d) => d !== name) : [...p, name],
     );
-    const visibleCities = showAllCities
-      ? filteredCities
-      : filteredCities.slice(0, 6);
-    const toggleCity = (name) =>
-      setSelectedCities((p) =>
-        p.includes(name) ? p.filter((c) => c !== name) : [...p, name],
-      );
-  
-    const runAllFilters = useCallback(
-      (sourceEvents) => {
-        let result = [...sourceEvents];
-  
-        if (selectedDivisions.length > 0) {
-          result = result.filter((e) => selectedDivisions.includes(e.division));
-        }
-  
-        if (selectedCommunities.length > 0) {
-          result = result.filter((e) =>
-            selectedCommunities.includes(e.community),
-          );
-        }
-  
-        if (date) {
-          const selectedDate = new Date(date);
-          result = result.filter((e) =>
-            isSelectedDateWithinEventRange(selectedDate, e.dateFrom, e.dateTo),
-          );
-        }
-  
-        if (travelers > 1) {
-          result = result.filter((e) => e.spotsLeft >= travelers);
-        }
-  
-        if (selectedCities.length > 0) {
-          result = result.filter((e) =>
-            selectedCities.some((city) => {
-              const cityName = city.toLowerCase();
-              const location = e.location?.toLowerCase() ?? "";
-              const sublocation = e.sublocation?.toLowerCase() ?? "";
-              return (
-                location.includes(cityName) ||
-                sublocation.includes(cityName) ||
-                cityName.includes(location) ||
-                cityName.includes(sublocation)
-              );
-            }),
-          );
-        }
-  
-        result = result.filter(
-          (e) => e.price >= priceRange[0] && e.price <= priceRange[1],
-        );
-  
-        return result;
-      },
-      [
-        selectedDivisions,
-        selectedCommunities,
-        date,
-        travelers,
-        selectedCities,
-        priceRange,
-      ],
-    );
-  
-    // ── Apply filters ──
-    const applyFilters = () => {
-      // Kept for manual button trigger, while filters also auto-update below.
-      setFiltered(runAllFilters(events));
-      setCurrentPage(1);
-    };
-  
-    useEffect(() => {
-      setFiltered(runAllFilters(events));
-      setCurrentPage(1);
-    }, [events, runAllFilters]);
-  
-    // ── Reset ──
-    const resetFilters = () => {
-      setSelectedDivisions([]);
-      setSelectedCommunities([]);
-      setDate("");
-      setTravelers(2);
-      setCitySearch("");
-      setSelectedCities([]);
-      setPriceRange([PRICE_MIN, PRICE_MAX]);
-      setCurrentPage(1);
-    };
-  
-    const hasActiveFilters =
-      selectedDivisions.length > 0 ||
-      selectedCommunities.length > 0 ||
-      Boolean(date) ||
-      travelers > 1 ||
-      selectedCities.length > 0 ||
-      priceRange[0] > PRICE_MIN ||
-      priceRange[1] < PRICE_MAX;
-  
-    const totalPages = Math.max(1, Math.ceil(filtered.length / EVENTS_PER_PAGE));
-    const paginatedEvents = filtered.slice(
-      (currentPage - 1) * EVENTS_PER_PAGE,
-      currentPage * EVENTS_PER_PAGE,
-    );
-  
-    useEffect(() => {
-      setCurrentPage((prev) => Math.min(prev, totalPages));
-    }, [totalPages]);
-  
-    const inputCls =
-      "w-full bg-white border border-gray-200 rounded-2xl px-4 py-3 text-sm text-gray-700 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-colors";
-    const labelCls =
-      "block text-teal-700 font-semibold text-xs uppercase tracking-wider mb-1.5 px-1";
-  
 
-return (
+  const toggleCommunity = (name) =>
+    setSelectedCommunities((p) =>
+      p.includes(name) ? p.filter((c) => c !== name) : [...p, name],
+    );
+
+  const removeDivision = (name) =>
+    setSelectedDivisions((p) => p.filter((d) => d !== name));
+
+  // ── City helpers ──
+  const filteredCities = MOCK_CITIES.filter((c) =>
+    c.name.toLowerCase().includes(citySearch.toLowerCase()),
+  );
+  const visibleCities = showAllCities
+    ? filteredCities
+    : filteredCities.slice(0, 6);
+  const toggleCity = (name) =>
+    setSelectedCities((p) =>
+      p.includes(name) ? p.filter((c) => c !== name) : [...p, name],
+    );
+
+  const runAllFilters = useCallback(
+    (sourceEvents) => {
+      let result = [...sourceEvents];
+
+      if (selectedDivisions.length > 0) {
+        result = result.filter((e) => selectedDivisions.includes(e.division));
+      }
+
+      if (selectedCommunities.length > 0) {
+        result = result.filter((e) =>
+          selectedCommunities.includes(e.community),
+        );
+      }
+
+      if (date) {
+        const selectedDate = new Date(date);
+        result = result.filter((e) =>
+          isSelectedDateWithinEventRange(selectedDate, e.dateFrom, e.dateTo),
+        );
+      }
+
+      if (travelers > 1) {
+        result = result.filter((e) => e.spotsLeft >= travelers);
+      }
+
+      if (selectedCities.length > 0) {
+        result = result.filter((e) =>
+          selectedCities.some((city) => {
+            const cityName = city.toLowerCase();
+            const location = e.location?.toLowerCase() ?? "";
+            const sublocation = e.sublocation?.toLowerCase() ?? "";
+            return (
+              location.includes(cityName) ||
+              sublocation.includes(cityName) ||
+              cityName.includes(location) ||
+              cityName.includes(sublocation)
+            );
+          }),
+        );
+      }
+
+      result = result.filter(
+        (e) => e.price >= priceRange[0] && e.price <= priceRange[1],
+      );
+
+      return result;
+    },
+    [
+      selectedDivisions,
+      selectedCommunities,
+      date,
+      travelers,
+      selectedCities,
+      priceRange,
+    ],
+  );
+
+  // ── Apply filters ──
+  const applyFilters = () => {
+    // Kept for manual button trigger, while filters also auto-update below.
+    setFiltered(runAllFilters(events));
+    setCurrentPage(1);
+  };
+
+  useEffect(() => {
+    setFiltered(runAllFilters(events));
+    setCurrentPage(1);
+  }, [events, runAllFilters]);
+
+  // ── Reset ──
+  const resetFilters = () => {
+    setSelectedDivisions([]);
+    setSelectedCommunities([]);
+    setDate("");
+    setTravelers(2);
+    setCitySearch("");
+    setSelectedCities([]);
+    setPriceRange([PRICE_MIN, PRICE_MAX]);
+    setCurrentPage(1);
+  };
+
+  const hasActiveFilters =
+    selectedDivisions.length > 0 ||
+    selectedCommunities.length > 0 ||
+    Boolean(date) ||
+    travelers > 1 ||
+    selectedCities.length > 0 ||
+    priceRange[0] > PRICE_MIN ||
+    priceRange[1] < PRICE_MAX;
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / EVENTS_PER_PAGE));
+  const paginatedEvents = filtered.slice(
+    (currentPage - 1) * EVENTS_PER_PAGE,
+    currentPage * EVENTS_PER_PAGE,
+  );
+
+  useEffect(() => {
+    setCurrentPage((prev) => Math.min(prev, totalPages));
+  }, [totalPages]);
+
+  const inputCls =
+    "w-full bg-white border border-gray-200 rounded-2xl px-4 py-3 text-sm text-gray-700 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-colors";
+  const labelCls =
+    "block text-teal-700 font-semibold text-xs uppercase tracking-wider mb-1.5 px-1";
+
+  return (
     <div className="relative bg-[#edfffd] min-h-screen pt-24 pb-16 overflow-hidden">
       {/* ── BACKGROUND ── */}
       <div className="absolute inset-0 z-0">
@@ -602,18 +605,14 @@ return (
           </div>
         </div>
         <div className="flex flex-col lg:flex-row gap-6 items-start">
-         
           {/* ════════════════════════════
               LEFT SIDEBAR
           ════════════════════════════ */}
-
           <aside className="w-full lg:w-72 xl:w-80 flex-shrink-0">
             <div className="lg:sticky lg:top-24 bg-[#cee2e5] backdrop-blur-md rounded-3xl shadow-lg overflow-hidden">
               <div className="h-1.5 bg-gradient-to-r from-teal-500 to-emerald-400" />
               <div className="p-5 space-y-5">
-
                 {/* Header */}
-
                 <div className="flex items-center gap-2.5 pb-3 border-b border-gray-100">
                   <div className="w-8 h-8 bg-teal-600 rounded-xl flex items-center justify-center flex-shrink-0">
                     <svg
@@ -633,8 +632,7 @@ return (
                   <span className="font-bold text-gray-800">Filter Events</span>
                 </div>
 
-                 {/* ── PRICE RANGE FILTER ── */}
-                
+                {/* ── PRICE RANGE FILTER ── */}
                 <div>
                   <label className={labelCls}>Filter Price (BDT)</label>
                   <div className="bg-white border border-gray-200 rounded-2xl p-4">
@@ -646,7 +644,7 @@ return (
                     />
                   </div>
                 </div>
-                
+
                 {/* ── DIVISIONS OF BANGLADESH (checkboxes) ── */}
                 <div>
                   <label className={labelCls}>Division</label>
@@ -691,17 +689,428 @@ return (
                     ))}
                   </div>
                 </div>
-                </div>
-                </aside>
 
-                <div className="flex-1 min-w-0">
-            <p className="text-teal-700 font-bold">
-              {loading ? "Loading..." : `${filtered.length} events`}
-            </p>
+                {/* ── COMMUNITY ── */}
+                <div>
+                  <label className={labelCls}>Community</label>
+                  <div className="space-y-2">
+                    <button
+                      onClick={() => setSelectedCommunities([])}
+                      className="w-full flex items-center gap-3 group py-0.5"
+                    >
+                      <div
+                        className={`w-5 h-5 rounded-md flex items-center justify-center border-2 flex-shrink-0 transition-all ${
+                          selectedCommunities.length === 0
+                            ? "bg-teal-600 border-teal-600"
+                            : "border-gray-300 group-hover:border-teal-400"
+                        }`}
+                      >
+                        {selectedCommunities.length === 0 && (
+                          <svg
+                            className="w-3 h-3 text-white"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={3}
+                              d="M5 13l4 4L19 7"
+                            />
+                          </svg>
+                        )}
+                      </div>
+                      <span className="text-sm text-left text-gray-600 group-hover:text-gray-900">
+                        All communities
+                      </span>
+                    </button>
+
+                    {MOCK_COMMUNITIES.map((communityName) => (
+                      <button
+                        key={communityName}
+                        onClick={() => toggleCommunity(communityName)}
+                        className="w-full flex items-center gap-3 group py-0.5"
+                      >
+                        <div
+                          className={`w-5 h-5 rounded-md flex items-center justify-center border-2 flex-shrink-0 transition-all ${
+                            selectedCommunities.includes(communityName)
+                              ? "bg-teal-600 border-teal-600"
+                              : "border-gray-300 group-hover:border-teal-400"
+                          }`}
+                        >
+                          {selectedCommunities.includes(communityName) && (
+                            <svg
+                              className="w-3 h-3 text-white"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={3}
+                                d="M5 13l4 4L19 7"
+                              />
+                            </svg>
+                          )}
+                        </div>
+                        <span
+                          className={`text-sm text-left transition-colors ${
+                            selectedCommunities.includes(communityName)
+                              ? "text-teal-700 font-medium"
+                              : "text-gray-600 group-hover:text-gray-900"
+                          }`}
+                        >
+                          {communityName}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* ── DATE ── */}
+                <div>
+                  <label className={labelCls}>Date</label>
+                  <input
+                    type="date"
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                    className={inputCls}
+                  />
+                </div>
+
+                {/* ── TIME ── */}
+                {/* <div>
+                  <label className={labelCls}>Time</label>
+                  <input type="time" value={time} onChange={e=>setTime(e.target.value)} className={inputCls}/>
+                </div> */}
+
+                {/* ── TRAVELER ── */}
+                <div>
+                  <label className={labelCls}>Traveler</label>
+                  <div className="flex items-center justify-between bg-white border border-gray-200 rounded-2xl px-4 py-3">
+                    <span className="text-gray-800 font-bold text-lg">
+                      {travelers}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setTravelers((p) => Math.max(1, p - 1))}
+                        disabled={travelers <= 1}
+                        className="w-8 h-8 flex items-center justify-center rounded-full border-2 border-gray-200 text-gray-500 hover:border-teal-500 hover:text-teal-600 hover:bg-teal-50 disabled:opacity-30 transition-all"
+                      >
+                        <svg
+                          className="w-3.5 h-3.5"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2.5}
+                            d="M20 12H4"
+                          />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => setTravelers((p) => Math.min(20, p + 1))}
+                        disabled={travelers >= 20}
+                        className="w-8 h-8 flex items-center justify-center rounded-full border-2 border-gray-200 text-gray-500 hover:border-teal-500 hover:text-teal-600 hover:bg-teal-50 disabled:opacity-30 transition-all"
+                      >
+                        <svg
+                          className="w-3.5 h-3.5"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2.5}
+                            d="M12 4v16m8-8H4"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* ── APPLY BUTTON ── */}
+                <button
+                  onClick={applyFilters}
+                  className="w-full py-3.5 bg-teal-700 hover:bg-teal-600 text-white font-bold rounded-2xl transition-all duration-200 hover:shadow-lg hover:shadow-teal-700/30 active:scale-95 flex items-center justify-center gap-2 text-sm tracking-wide"
+                >
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                  Apply Filters
+                </button>
+
+                {hasActiveFilters && (
+                  <button
+                    onClick={resetFilters}
+                    className="w-full py-2 text-xs text-gray-400 hover:text-teal-600 transition-colors font-medium"
+                  >
+                    ✕ Reset all filters
+                  </button>
+                )}
+
+                {/* ── CITIES ── */}
+                <div className="border-t border-gray-100 pt-4">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-1 h-5 bg-yellow-400 rounded-full" />
+                    <h3 className="text-gray-800 font-bold text-sm">Cities</h3>
+                  </div>
+                  <div className="relative mb-3">
+                    <input
+                      type="text"
+                      placeholder="Search cities..."
+                      value={citySearch}
+                      onChange={(e) => setCitySearch(e.target.value)}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 pr-9 text-sm focus:outline-none focus:border-teal-500 transition-colors"
+                    />
+                    <svg
+                      className="absolute right-3 top-2.5 w-4 h-4 text-gray-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                      />
+                    </svg>
+                  </div>
+                  {/* TODO: fetch from GET /api/cities */}
+                  <div className="space-y-2">
+                    {visibleCities.map((city) => (
+                      <button
+                        key={city.id}
+                        onClick={() => toggleCity(city.name)}
+                        className="w-full flex items-center gap-3 group py-0.5"
+                      >
+                        <div
+                          className={`w-5 h-5 rounded-md flex items-center justify-center border-2 flex-shrink-0 transition-all
+                          ${selectedCities.includes(city.name) ? "bg-teal-600 border-teal-600" : "border-gray-300 group-hover:border-teal-400"}`}
+                        >
+                          {selectedCities.includes(city.name) && (
+                            <svg
+                              className="w-3 h-3 text-white"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={3}
+                                d="M5 13l4 4L19 7"
+                              />
+                            </svg>
+                          )}
+                        </div>
+                        <span
+                          className={`text-sm text-left transition-colors ${selectedCities.includes(city.name) ? "text-teal-700 font-medium" : "text-gray-600 group-hover:text-gray-900"}`}
+                        >
+                          {city.name}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                  {filteredCities.length > 6 && (
+                    <button
+                      onClick={() => setShowAllCities(!showAllCities)}
+                      className="mt-3 text-sm text-teal-600 hover:text-teal-700 font-medium flex items-center gap-1"
+                    >
+                      {showAllCities
+                        ? "Show less"
+                        : `Show more (${filteredCities.length - 6} more)`}
+                      <svg
+                        className={`w-4 h-4 transition-transform ${showAllCities ? "rotate-180" : ""}`}
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          {/* ════════════════════════════
+              RIGHT — EVENTS
+          ════════════════════════════ */}
+          <div className="flex-1 min-w-0">
+            {/* Selected divisions show as pills above cards */}
+            <DivisionSummaryCard
+              divisions={selectedDivisions}
+              onRemove={removeDivision}
+            />
+
+            {/* Result bar + active chips */}
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
+              <p className="text-gray-600 text-sm">
+                Showing{" "}
+                <span className="text-teal-700 font-bold">
+                  {filtered.length}
+                </span>{" "}
+                events
+                {hasActiveFilters && " (filtered)"}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {selectedCommunities.map((communityName) => (
+                  <span
+                    key={communityName}
+                    className="flex items-center gap-1.5 px-3 py-1 bg-teal-100 text-teal-700 text-xs font-medium rounded-full"
+                  >
+                    👥 {communityName}
+                    <button
+                      onClick={() => toggleCommunity(communityName)}
+                      className="font-bold hover:text-teal-900"
+                    >
+                      <X/>
+                    </button>
+                  </span>
+                ))}
+                {selectedCities.map((c) => (
+                  <span
+                    key={c}
+                    className="flex items-center gap-1.5 px-3 py-1 bg-teal-100 text-teal-700 text-xs font-medium rounded-full"
+                  >
+                    🏙️ {c}
+                    <button
+                      onClick={() => toggleCity(c)}
+                      className="font-bold hover:text-teal-900"
+                    >
+                      <X/>
+                    </button>
+                  </span>
+                ))}
+                {(priceRange[0] > PRICE_MIN || priceRange[1] < PRICE_MAX) && (
+                  <span className="flex items-center gap-1.5 px-3 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-full">
+                    💰 BDT {priceRange[0].toLocaleString()} –{" "}
+                    {priceRange[1].toLocaleString()}
+                    <button
+                      onClick={() => setPriceRange([PRICE_MIN, PRICE_MAX])}
+                      className="font-bold hover:text-red-900"
+                    >
+                      <X/>
+                    </button>
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Cards */}
+            {loading ? (
+              <div className="grid grid-cols-2 gap-3 sm:gap-6">
+                {[1, 2, 3, 4].map((n) => (
+                  <div
+                    key={n}
+                    className="bg-white rounded-2xl overflow-hidden shadow-sm animate-pulse"
+                  >
+                    <div className="h-48 bg-gray-200" />
+                    <div className="p-4 space-y-3">
+                      <div className="h-4 bg-gray-200 rounded w-3/4" />
+                      <div className="h-3 bg-gray-200 rounded w-full" />
+                      <div className="h-3 bg-gray-200 rounded w-2/3" />
+                      <div className="h-8 bg-gray-200 rounded w-1/3 mt-2" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : filtered.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-32 text-center bg-white/60 backdrop-blur-sm rounded-3xl">
+                <div className="text-7xl mb-4"><Search /></div>
+                <h3 className="text-xl font-bold text-gray-700 mb-2">
+                  No events found
+                </h3>
+                <p className="text-gray-400 text-sm mb-6">
+                  Try adjusting your filters
+                </p>
+                <button
+                  onClick={resetFilters}
+                  className="px-6 py-2.5 bg-teal-600 text-white rounded-full text-sm font-semibold hover:bg-teal-500 transition-colors"
+                >
+                  Clear Filters
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="grid grid-cols-2 gap-3 sm:gap-6">
+                  {paginatedEvents.map((event) => (
+                    <EventCard key={event.id} event={event} />
+                  ))}
+                </div>
+
+                {filtered.length > EVENTS_PER_PAGE && (
+                  <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
+                    <button
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.max(1, prev - 1))
+                      }
+                      disabled={currentPage === 1}
+                      className="px-3 py-2 rounded-xl border border-gray-200 text-sm font-semibold text-gray-600 bg-white hover:border-teal-500 hover:text-teal-700 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      Prev
+                    </button>
+
+                    {Array.from({ length: totalPages }, (_, index) => {
+                      const page = index + 1;
+                      return (
+                        <button
+                          key={page}
+                          onClick={() => setCurrentPage(page)}
+                          className={`px-3.5 py-2 rounded-xl border text-sm font-bold transition-colors ${
+                            currentPage === page
+                              ? "bg-teal-700 text-white border-teal-700"
+                              : "bg-white text-gray-700 border-gray-200 hover:border-teal-500 hover:text-teal-700"
+                          }`}
+                        >
+                          {page}
+                        </button>
+                      );
+                    })}
+
+                    <button
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+                      }
+                      disabled={currentPage === totalPages}
+                      className="px-3 py-2 rounded-xl border border-gray-200 text-sm font-semibold text-gray-600 bg-white hover:border-teal-500 hover:text-teal-700 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      Next
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
           </div>
         </div>
       </div>
     </div>
   );
- 
+};
+
 export default Events;
