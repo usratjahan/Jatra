@@ -957,12 +957,71 @@ const Events = () => {
               </div>
             </div>
           </aside>
+{/* ════════════════════════════
+              RIGHT — EVENTS
+          ════════════════════════════ */}
+          <div className="flex-1 min-w-0">
+            {/* Selected divisions show as pills above cards */}
+            <DivisionSummaryCard
+              divisions={selectedDivisions}
+              onRemove={removeDivision}
+            />
 
-                <div className="flex-1 min-w-0">
-            <p className="text-teal-700 font-bold">
-              {loading ? "Loading..." : `${filtered.length} events`}
-            </p>
-          </div>
+            {/* Result bar + active chips */}
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
+              <p className="text-gray-600 text-sm">
+                Showing{" "}
+                <span className="text-teal-700 font-bold">
+                  {filtered.length}
+                </span>{" "}
+                events
+                {hasActiveFilters && " (filtered)"}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {selectedCommunities.map((communityName) => (
+                  <span
+                    key={communityName}
+                    className="flex items-center gap-1.5 px-3 py-1 bg-teal-100 text-teal-700 text-xs font-medium rounded-full"
+                  >
+                    👥 {communityName}
+                    <button
+                      onClick={() => toggleCommunity(communityName)}
+                      className="font-bold hover:text-teal-900"
+                    >
+                      <X/>
+                    </button>
+                  </span>
+                ))}
+                {selectedCities.map((c) => (
+                  <span
+                    key={c}
+                    className="flex items-center gap-1.5 px-3 py-1 bg-teal-100 text-teal-700 text-xs font-medium rounded-full"
+                  >
+                    🏙️ {c}
+                    <button
+                      onClick={() => toggleCity(c)}
+                      className="font-bold hover:text-teal-900"
+                    >
+                      <X/>
+                    </button>
+                  </span>
+                ))}
+                {(priceRange[0] > PRICE_MIN || priceRange[1] < PRICE_MAX) && (
+                  <span className="flex items-center gap-1.5 px-3 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-full">
+                    💰 BDT {priceRange[0].toLocaleString()} –{" "}
+                    {priceRange[1].toLocaleString()}
+                    <button
+                      onClick={() => setPriceRange([PRICE_MIN, PRICE_MAX])}
+                      className="font-bold hover:text-red-900"
+                    >
+                      <X/>
+                    </button>
+                  </span>
+                )}
+              </div>
+            </div>
+
+            
         </div>
       </div>
     </div>
