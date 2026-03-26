@@ -159,6 +159,139 @@ const PriceRangeSlider = ({ min, max, value, onChange }) => {
     </div>
   );
 };
+const EventCard = ({ event }) => {
+  const navigate = useNavigate();
+
+  const openDetails = () => {
+    navigate(`/events/${event.id}`);
+  };
+
+  return (
+  <div
+    className="bg-[#0F393E] cursor-pointer rounded-[1.35rem] p-2 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl sm:rounded-3xl sm:p-[12px]"
+    role="button"
+    tabIndex={0}
+    onClick={openDetails}
+    onKeyDown={(e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        openDetails();
+      }
+    }}
+    aria-label={`Open details for ${event.title}`}
+  >
+    <div className="overflow-hidden rounded-[18px] bg-white sm:rounded-[22px]">
+      <div className="relative m-2.5 h-28 overflow-hidden rounded-xl bg-gradient-to-br from-teal-100 to-cyan-200 sm:m-3 sm:h-52 sm:rounded-2xl">
+        <img
+          src={event.image}
+          alt={event.title}
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            e.target.style.display = "none";
+          }}
+        />
+        <div className="absolute right-2 top-2 flex items-center gap-1 rounded-xl bg-white px-2 py-1 shadow-md sm:right-3 sm:top-3 sm:px-2.5">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="#ECC62D"
+            stroke="#ECC62D"
+            strokeWidth="1"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+          </svg>
+          <span className="text-gray-900 font-bold text-xs">
+            {event.rating}
+          </span>
+        </div>
+      </div>
+      <div className="px-3 pb-3 pt-1.5 sm:px-4 sm:pb-4 sm:pt-2">
+        <div className="mb-2.5 flex items-start gap-1.5 sm:mb-3 sm:gap-2">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#374151"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="mt-0.5 h-4 w-4 flex-shrink-0 sm:h-5 sm:w-5"
+          >
+            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+            <circle cx="12" cy="10" r="3" />
+          </svg>
+          <div>
+            <p className="text-sm font-bold leading-tight text-gray-900 sm:text-lg">
+              {event.location}
+            </p>
+            {event.sublocation && (
+              <p className="text-[11px] leading-tight text-gray-700 sm:text-base">
+                {event.sublocation}
+              </p>
+            )}
+          </div>
+        </div>
+        <div className="mb-2.5 flex flex-col gap-1.5 sm:mb-3 sm:flex-row sm:items-center sm:gap-6">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#6B7280"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
+              <line x1="16" x2="16" y1="2" y2="6" />
+              <line x1="8" x2="8" y1="2" y2="6" />
+              <line x1="3" x2="21" y1="10" y2="10" />
+              <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01" />
+            </svg>
+            <span className="text-[11px] font-medium text-gray-700 sm:text-sm">
+              {event.dateFrom} - {event.dateTo}
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#6B7280"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+            <span className="text-[11px] font-medium text-gray-700 sm:text-sm">
+              {event.spotsLeft} left
+            </span>
+          </div>
+        </div>
+        <div className="my-2 border-t-2 border-dashed border-gray-200 sm:my-3" />
+        <p className="text-xl font-bold tracking-tight text-gray-900 sm:text-3xl">
+          <span className="font-bold">BDT </span>
+          {event.price.toLocaleString("en-BD")}
+        </p>
+      </div>
+    </div>
+  </div>
+  );
+};
 const Family = () => {
   return (
     <div className="relative bg-[#edfffd] min-h-screen pt-24 pb-16">
