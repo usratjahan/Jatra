@@ -292,6 +292,33 @@ const EventCard = ({ event }) => {
   </div>
   );
 };
+const DivisionSummaryCard = ({ divisions, onRemove }) => {
+  if (!divisions.length) return null;
+  return (
+    <div className="mb-5 bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-sm border border-teal-100">
+      <p className="text-xs text-teal-600 font-semibold uppercase tracking-wider mb-2">
+        Selected Divisions
+      </p>
+      <div className="flex flex-wrap gap-2">
+        {divisions.map((d) => (
+          <span
+            key={d}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-teal-600 text-white text-xs font-semibold rounded-full"
+          >
+            📍 {d}
+            <button
+              onClick={() => onRemove(d)}
+              className="hover:text-red-200 transition-colors font-bold ml-0.5"
+            >
+              ×
+            </button>
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const Family = () => {
   return (
     <div className="relative bg-[#edfffd] min-h-screen pt-24 pb-16">
