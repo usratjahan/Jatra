@@ -318,12 +318,161 @@ const DivisionSummaryCard = ({ divisions, onRemove }) => {
     </div>
   );
 };
-
 const Family = () => {
-  return (
+  const [date, setDate] = useState("");
+  const [travelers, setTravelers] = useState(2);
+  const [citySearch, setCitySearch] = useState("");
+  const [selectedCities, setSelectedCities] = useState([]);
+  const [showAllCities, setShowAllCities] = useState(false);
+  const [selectedDivisions, setSelectedDivisions] = useState([]);
+  const [priceRange, setPriceRange] = useState([PRICE_MIN, PRICE_MAX]);
+  const [events, setEvents] = useState([]);
+  const [filtered, setFiltered] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        setLoading(true);
+        // TODO: const res = await fetch('/api/events/family'); const data = await res.json();
+        // NOTE: Backend filters WHERE community = 'Family'
+        // setEvents(data); setFiltered(data);
+        const raw = await getAdminEvents();
+        const mapped = raw
+          .filter((e) => e.community === "Family")
+          .map((e) => ({
+            id: e.id,
+            title: e.title,
+            location: e.location,
+            sublocation: e.sublocation,
+            price: e.price,
+            dateFrom: e.dateFrom,
+            dateTo: e.dateTo,
+            spotsLeft: e.spotsLeft,
+            rating: e.rating ?? e.avgRating ?? 5.0,
+            image: e.image,
+            division: e.division,
+          }));
+        setEvents(mapped);
+        setFiltered(mapped);
+      } catch {
+        setEvents([]);
+        setFiltered([]);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  const toggleDivision = (name) =>
+    setSelectedDivisions((p) =>
+      p.includes(name) ? p.filter((d) => d !== name) : [...p, name],
+    );
+  const removeDivision = (name) =>
+    setSelectedDivisions((p) => p.filter((d) => d !== name));
+  const filteredCities = MOCK_CITIES.filter((c) =>
+    c.name.toLowerCase().includes(citySearch.toLowerCase()),
+  );
+  const visibleCities = showAllCities
+    ? filteredCities
+    : filteredCities.slice(0, 6);
+  const toggleCity = (name) =>
+    setSelectedCities((p) =>
+      p.includes(name) ? p.filter((c) => c !== name) : [...p, name],
+    );
+
+  const runAllFilters = useCallback(
+    (sourceEvents) => {
+      let result = [...sourceEvents];
+
+      if (selectedDivisions.length > 0) {
+        result = result.filter((e) => selectedDivisions.includes(e.division));
+      }
+
+      if (date) {
+        const selectedDate = new Date(date);
+        result = result.filter((e) =>
+          isSelectedDateWithinEventRange(selectedDate, e.dateFrom, e.dateTo),
+        );
+      }
+
+      if (travelers > 1) {
+        result = result.filter((e) => e.spotsLeft >= travelers);
+      }
+
+      if (selectedCities.length > 0) {
+        result = result.filter((e) =>
+          selectedCities.some((city) => {
+            const cityName = city.toLowerCase();
+            const location = e.location?.toLowerCase() ?? "";
+            const sublocation = e.sublocation?.toLowerCase() ?? "";
+            return (
+              location.includes(cityName) ||
+              sublocation.includes(cityName) ||
+              cityName.includes(location) ||
+              cityName.includes(sublocation)
+            );
+          }),
+        );
+      }
+
+      result = result.filter(
+        (e) => e.price >= priceRange[0] && e.price <= priceRange[1],
+      );
+
+      return result;
+    },
+    [selectedDivisions, date, travelers, selectedCities, priceRange],
+  );
+
+  const applyFilters = () => {
+    setFiltered(runAllFilters(events));
+    setCurrentPage(1);
+  };
+
+  useEffect(() => {
+    setFiltered(runAllFilters(events));
+    setCurrentPage(1);
+  }, [events, runAllFilters]);
+
+  const resetFilters = () => {
+    setSelectedDivisions([]);
+    setDate("");
+    setTravelers(2);
+    setCitySearch("");
+    setSelectedCities([]);
+    setPriceRange([PRICE_MIN, PRICE_MAX]);
+    setCurrentPage(1);
+  };
+
+  const hasActiveFilters =
+    selectedDivisions.length > 0 ||
+    Boolean(date) ||
+    travelers > 1 ||
+    selectedCities.length > 0 ||
+    priceRange[0] > PRICE_MIN ||
+    priceRange[1] < PRICE_MAX;
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / EVENTS_PER_PAGE));
+  const paginatedEvents = filtered.slice(
+    (currentPage - 1) * EVENTS_PER_PAGE,
+    currentPage * EVENTS_PER_PAGE,
+  );
+  useEffect(() => {
+    setCurrentPage((prev) => Math.min(prev, totalPages));
+  }, [totalPages]);
+
+  const inputCls =
+    "w-full bg-white border border-gray-200 rounded-2xl px-4 py-3 text-sm text-gray-700 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-colors";
+  const labelCls =
+    "block text-teal-700 font-semibold text-xs uppercase tracking-wider mb-1.5 px-1";
+ return (
     <div className="relative bg-[#edfffd] min-h-screen pt-24 pb-16">
       <div className="max-w-7xl mx-auto px-4">
-        <p className="text-teal-700 font-bold text-xl">Family community page...</p>
+        <p className="text-teal-700 font-bold">
+          {loading ? "Loading Family events..." : `${filtered.length} Family events loaded`}
+        </p>
       </div>
     </div>
   );
