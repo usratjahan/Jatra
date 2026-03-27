@@ -5,6 +5,7 @@ import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
 import Home from "./pages/Home";
 import Events from "./pages/Events";
+import Family from "./components/Community/Family";
 
 const UserLayout = () => (
   <>
@@ -20,6 +21,7 @@ const App = () => {
           <Route element={<UserLayout />}>
             <Route path="/" element={<Home />} />
               <Route path="/events" element={<Events />} />
+              <Route path="/community/family" element={<Family />} />
 
 </Route>
         </Routes>
