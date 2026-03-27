@@ -467,15 +467,317 @@ const Family = () => {
     "w-full bg-white border border-gray-200 rounded-2xl px-4 py-3 text-sm text-gray-700 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-colors";
   const labelCls =
     "block text-teal-700 font-semibold text-xs uppercase tracking-wider mb-1.5 px-1";
- return (
-    <div className="relative bg-[#edfffd] min-h-screen pt-24 pb-16">
-      <div className="max-w-7xl mx-auto px-4">
-        <p className="text-teal-700 font-bold">
-          {loading ? "Loading Family events..." : `${filtered.length} Family events loaded`}
-        </p>
+ 
+  return (
+    <div className="relative bg-[#edfffd] min-h-screen pt-24 pb-16 overflow-hidden">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+                {/* FamilyHeader banner */}
+
+        <div className="mb-10 text-center">
+          {/* <p className="text-teal-600 font-semibold text-sm uppercase tracking-widest mb-2">
+            Discover & Book
+          </p> */}
+          {/* <h1 className="text-4xl sm:text-5xl font-bold text-gray-800 mb-3">
+            Family Community
+          </h1> */}
+          {/* <p className="text-gray-500 text-base max-w-md mx-auto">
+            Travel experiences designed for families with children of all ages
+          </p> */}
+          <div className="flex justify-center mt-5">
+            <img
+              src={travelHeader}
+              alt="Travel"
+              className="w-full max-w-[1650px] h-auto object-contain drop-shadow-md"
+            />
+          </div>
+        </div>
+        <div className="flex flex-col lg:flex-row gap-6 items-start">
+         
+          {/* ════════ LEFT SIDEBAR ════════ */}
+
+          <aside className="w-full lg:w-72 xl:w-80 flex-shrink-0">
+            <div className="lg:sticky lg:top-24 bg-[#cee2e5] backdrop-blur-md rounded-3xl shadow-lg overflow-hidden">
+              <div className="h-1.5 bg-gradient-to-r from-teal-500 to-emerald-400" />
+              <div className="p-5 space-y-5">
+
+                {/* Filter header */}
+
+                <div className="flex items-center gap-2.5 pb-3 border-b border-gray-100">
+                  <div className="w-8 h-8 bg-teal-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <svg
+                      className="w-4 h-4 text-white"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"
+                      />
+                    </svg>
+                  </div>
+                  <span className="font-bold text-gray-800">Filter Events</span>
+                </div>
+
+                {/* Price Range */}
+
+
+                <div>
+                  <label className={labelCls}>Filter Price (BDT)</label>
+                  <div className="bg-white border border-gray-200 rounded-2xl p-4">
+                    <PriceRangeSlider
+                      min={PRICE_MIN}
+                      max={PRICE_MAX}
+                      value={priceRange}
+                      onChange={setPriceRange}
+                    />
+                  </div>
+                </div>
+
+                {/* Division checkboxes */}
+
+                <div>
+                  <label className={labelCls}>Division</label>
+                  {/* TODO: fetch from GET /api/divisions */}
+                  <div className="space-y-2">
+                    {MOCK_DIVISIONS.map((div) => (
+                      <button
+                        key={div.id}
+                        onClick={() => toggleDivision(div.name)}
+                        className="w-full flex items-center gap-3 group py-0.5"
+                      >
+                        <div
+                          className={`w-5 h-5 rounded-md flex items-center justify-center border-2 flex-shrink-0 transition-all ${selectedDivisions.includes(div.name) ? "bg-teal-600 border-teal-600" : "border-gray-300 group-hover:border-teal-400"}`}
+                        >
+                          {selectedDivisions.includes(div.name) && (
+                            <svg
+                              className="w-3 h-3 text-white"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={3}
+                                d="M5 13l4 4L19 7"
+                              />
+                            </svg>
+                          )}
+                        </div>
+                        <span
+                          className={`text-sm text-left transition-colors ${selectedDivisions.includes(div.name) ? "text-teal-700 font-medium" : "text-gray-600 group-hover:text-gray-900"}`}
+                        >
+                          {div.name}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+
+                       {/* Date */}
+
+                <div>
+                  <label className={labelCls}>Date</label>
+                  <input
+                    type="date"
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                    className={inputCls}
+                  />
+                </div>
+
+
+                                        {/* Traveler */}
+
+
+                <div>
+                  <label className={labelCls}>Traveler</label>
+                  <div className="flex items-center justify-between bg-white border border-gray-200 rounded-2xl px-4 py-3">
+                    <span className="text-gray-800 font-bold text-lg">
+                      {travelers}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setTravelers((p) => Math.max(1, p - 1))}
+                        disabled={travelers <= 1}
+                        className="w-8 h-8 flex items-center justify-center rounded-full border-2 border-gray-200 text-gray-500 hover:border-teal-500 hover:text-teal-600 hover:bg-teal-50 disabled:opacity-30 transition-all"
+                      >
+                        <svg
+                          className="w-3.5 h-3.5"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2.5}
+                            d="M20 12H4"
+                          />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => setTravelers((p) => Math.min(20, p + 1))}
+                        disabled={travelers >= 20}
+                        className="w-8 h-8 flex items-center justify-center rounded-full border-2 border-gray-200 text-gray-500 hover:border-teal-500 hover:text-teal-600 hover:bg-teal-50 disabled:opacity-30 transition-all"
+                      >
+                        <svg
+                          className="w-3.5 h-3.5"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2.5}
+                            d="M12 4v16m8-8H4"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+
+
+                                   {/* Apply + Reset */}
+
+                <button
+                  onClick={applyFilters}
+                  className="w-full py-3.5 bg-teal-700 hover:bg-teal-600 text-white font-bold rounded-2xl transition-all duration-200 hover:shadow-lg active:scale-95 flex items-center justify-center gap-2 text-sm tracking-wide"
+                >
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                  Apply Filters
+                </button>
+                {hasActiveFilters && (
+                  <button
+                    onClick={resetFilters}
+                    className="w-full py-2 text-xs text-gray-400 hover:text-teal-600 transition-colors font-medium"
+                  >
+                    ✕ Reset all filters
+                  </button>
+                )}
+
+
+
+                {/* Cities search */}
+
+                <div className="border-t border-gray-100 pt-4">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-1 h-5 bg-yellow-400 rounded-full" />
+                    <h3 className="text-gray-800 font-bold text-sm">Cities</h3>
+                  </div>
+                  <div className="relative mb-3">
+                    <input
+                      type="text"
+                      placeholder="Search cities..."
+                      value={citySearch}
+                      onChange={(e) => setCitySearch(e.target.value)}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 pr-9 text-sm focus:outline-none focus:border-teal-500 transition-colors"
+                    />
+                    <svg
+                      className="absolute right-3 top-2.5 w-4 h-4 text-gray-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                      />
+                    </svg>
+                  </div>
+                  {/* TODO: fetch from GET /api/cities */}
+                  <div className="space-y-2">
+                    {visibleCities.map((city) => (
+                      <button
+                        key={city.id}
+                        onClick={() => toggleCity(city.name)}
+                        className="w-full flex items-center gap-3 group py-0.5"
+                      >
+                        <div
+                          className={`w-5 h-5 rounded-md flex items-center justify-center border-2 flex-shrink-0 transition-all ${selectedCities.includes(city.name) ? "bg-teal-600 border-teal-600" : "border-gray-300 group-hover:border-teal-400"}`}
+                        >
+                          {selectedCities.includes(city.name) && (
+                            <svg
+                              className="w-3 h-3 text-white"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={3}
+                                d="M5 13l4 4L19 7"
+                              />
+                            </svg>
+                          )}
+                        </div>
+                        <span
+                          className={`text-sm text-left transition-colors ${selectedCities.includes(city.name) ? "text-teal-700 font-medium" : "text-gray-600 group-hover:text-gray-900"}`}
+                        >
+                          {city.name}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                  {filteredCities.length > 6 && (
+                    <button
+                      onClick={() => setShowAllCities(!showAllCities)}
+                      className="mt-3 text-sm text-teal-600 hover:text-teal-700 font-medium flex items-center gap-1"
+                    >
+                      {showAllCities
+                        ? "Show less"
+                        : `Show more (${filteredCities.length - 6} more)`}
+                      <svg
+                        className={`w-4 h-4 transition-transform ${showAllCities ? "rotate-180" : ""}`}
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </aside>
+             {/* Right placeholder */}
+          <div className="flex-1 min-w-0">
+            <p className="text-teal-700 font-bold">
+              {loading ? "Loading..." : `${filtered.length} Family events`}
+            </p>
+          </div>
+ 
+        </div>
       </div>
     </div>
   );
-};
- 
 export default Family;
