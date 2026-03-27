@@ -159,6 +159,7 @@ const PriceRangeSlider = ({ min, max, value, onChange }) => {
     </div>
   );
 };
+
 const EventCard = ({ event }) => {
   const navigate = useNavigate();
 
@@ -292,6 +293,7 @@ const EventCard = ({ event }) => {
   </div>
   );
 };
+
 const DivisionSummaryCard = ({ divisions, onRemove }) => {
   if (!divisions.length) return null;
   return (
@@ -318,6 +320,7 @@ const DivisionSummaryCard = ({ divisions, onRemove }) => {
     </div>
   );
 };
+
 const Family = () => {
   const [date, setDate] = useState("");
   const [travelers, setTravelers] = useState(2);
@@ -467,7 +470,8 @@ const Family = () => {
     "w-full bg-white border border-gray-200 rounded-2xl px-4 py-3 text-sm text-gray-700 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-colors";
   const labelCls =
     "block text-teal-700 font-semibold text-xs uppercase tracking-wider mb-1.5 px-1";
- 
+
+
   return (
     <div className="relative bg-[#edfffd] min-h-screen pt-24 pb-16 overflow-hidden">
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -769,15 +773,146 @@ const Family = () => {
               </div>
             </div>
           </aside>
-             {/* Right placeholder */}
+
+
           <div className="flex-1 min-w-0">
-            <p className="text-teal-700 font-bold">
-              {loading ? "Loading..." : `${filtered.length} Family events`}
-            </p>
+                      {/* Division pills */}
+
+            <DivisionSummaryCard
+              divisions={selectedDivisions}
+              onRemove={removeDivision}
+            />
+            {/* Result count + active filter chips */}
+
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
+              <p className="text-gray-600 text-sm">
+                Showing{" "}
+                <span className="text-teal-700 font-bold">
+                  {filtered.length}
+                </span>{" "}
+                events{hasActiveFilters && " (filtered)"}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {selectedCities.map((c) => (
+                  <span
+                    key={c}
+                    className="flex items-center gap-1.5 px-3 py-1 bg-teal-100 text-teal-700 text-xs font-medium rounded-full"
+                  >
+                    🏙️ {c}
+                    <button
+                      onClick={() => toggleCity(c)}
+                      className="font-bold hover:text-teal-900"
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+                {(priceRange[0] > PRICE_MIN || priceRange[1] < PRICE_MAX) && (
+                  <span className="flex items-center gap-1.5 px-3 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-full">
+                    💰 BDT {priceRange[0].toLocaleString()} –{" "}
+                    {priceRange[1].toLocaleString()}
+                    <button
+                      onClick={() => setPriceRange([PRICE_MIN, PRICE_MAX])}
+                      className="font-bold hover:text-red-900"
+                    >
+                      ×
+                    </button>
+                  </span>
+                )}
+              </div>
+            </div>
+
+                        {/* Loading skeleton */}
+
+            {loading ? (
+              <div className="grid grid-cols-2 gap-3 sm:gap-6">
+                {[1, 2, 3, 4].map((n) => (
+                  <div
+                    key={n}
+                    className="bg-white rounded-2xl overflow-hidden shadow-sm animate-pulse"
+                  >
+                    <div className="h-48 bg-gray-200" />
+                    <div className="p-4 space-y-3">
+                      <div className="h-4 bg-gray-200 rounded w-3/4" />
+                      <div className="h-3 bg-gray-200 rounded w-full" />
+                      <div className="h-3 bg-gray-200 rounded w-2/3" />
+                      <div className="h-8 bg-gray-200 rounded w-1/3 mt-2" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : filtered.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-32 text-center bg-white/60 backdrop-blur-sm rounded-3xl">
+                <div className="text-7xl mb-4">🔍</div>
+                <h3 className="text-xl font-bold text-gray-700 mb-2">
+                  No events found
+                </h3>
+                <p className="text-gray-400 text-sm mb-6">
+                  Try adjusting your filters
+                </p>
+                <button
+                  onClick={resetFilters}
+                  className="px-6 py-2.5 bg-teal-600 text-white rounded-full text-sm font-semibold hover:bg-teal-500 transition-colors"
+                >
+                  Clear Filters
+                </button>
+              </div>
+            ) : (
+              <>
+
+
+
+
+                              {/* Event cards grid */}
+
+                <div className="grid grid-cols-2 gap-3 sm:gap-6">
+                  {paginatedEvents.map((event) => (
+                    <EventCard key={event.id} event={event} />
+                  ))}
+                </div>
+
+
+
+                                {/* Pagination */}
+
+                {filtered.length > EVENTS_PER_PAGE && (
+                  <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
+                    <button
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                      className="px-3 py-2 rounded-xl border border-gray-200 text-sm font-semibold text-gray-600 bg-white hover:border-teal-500 hover:text-teal-700 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      Prev
+                    </button>
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                      (page) => (
+                        <button
+                          key={page}
+                          onClick={() => setCurrentPage(page)}
+                          className={`px-3.5 py-2 rounded-xl border text-sm font-bold transition-colors ${currentPage === page ? "bg-teal-700 text-white border-teal-700" : "bg-white text-gray-700 border-gray-200 hover:border-teal-500 hover:text-teal-700"}`}
+                        >
+                          {page}
+                        </button>
+                      ),
+                    )}
+                    <button
+                      onClick={() =>
+                        setCurrentPage((p) => Math.min(totalPages, p + 1))
+                      }
+                      disabled={currentPage === totalPages}
+                      className="px-3 py-2 rounded-xl border border-gray-200 text-sm font-semibold text-gray-600 bg-white hover:border-teal-500 hover:text-teal-700 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      Next
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
           </div>
- 
         </div>
       </div>
     </div>
   );
+};
+
 export default Family;
