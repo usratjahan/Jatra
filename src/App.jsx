@@ -6,6 +6,7 @@ import Footer from "./components/layout/Footer";
 import Home from "./pages/Home";
 import Events from "./pages/Events";
 import Family from "./components/Community/Family";
+import Male from "./components/Community/Male";
 
 const UserLayout = () => (
   <>
@@ -22,6 +23,7 @@ const App = () => {
             <Route path="/" element={<Home />} />
               <Route path="/events" element={<Events />} />
               <Route path="/community/family" element={<Family />} />
+            <Route path="/community/male" element={<Male />} />
 
 </Route>
         </Routes>
