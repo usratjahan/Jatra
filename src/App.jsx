@@ -7,6 +7,7 @@ import Home from "./pages/Home";
 import Events from "./pages/Events";
 import Family from "./components/Community/Family";
 import Male from "./components/Community/Male";
+import Female from "./components/Community/Female";
 
 const UserLayout = () => (
   <>
@@ -24,6 +25,7 @@ const App = () => {
               <Route path="/events" element={<Events />} />
               <Route path="/community/family" element={<Family />} />
             <Route path="/community/male" element={<Male />} />
+            <Route path="/community/female" element={<Female />} />
 
 </Route>
         </Routes>
