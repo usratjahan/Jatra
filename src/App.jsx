@@ -8,6 +8,7 @@ import Events from "./pages/Events";
 import Family from "./components/Community/Family";
 import Male from "./components/Community/Male";
 import Female from "./components/Community/Female";
+import Combined from "./components/Community/Combined";
 
 const UserLayout = () => (
   <>
@@ -26,6 +27,7 @@ const App = () => {
               <Route path="/community/family" element={<Family />} />
             <Route path="/community/male" element={<Male />} />
             <Route path="/community/female" element={<Female />} />
+            <Route path="/community/combined" element={<Combined />} />
 
 </Route>
         </Routes>
