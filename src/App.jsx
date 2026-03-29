@@ -10,6 +10,7 @@ import Male from "./components/Community/Male";
 import Female from "./components/Community/Female";
 import Combined from "./components/Community/Combined";
 import Explore from "./pages/Explore";
+import ContactUs from "./pages/ContactUs";
 
 const UserLayout = () => (
   <>
@@ -30,6 +31,8 @@ const App = () => {
             <Route path="/community/female" element={<Female />} />
             <Route path="/community/combined" element={<Combined />} />
            <Route path="/explore" element={<Explore />} />
+           <Route path="/contact" element={<ContactUs />} />
+
 
 </Route>
         </Routes>
