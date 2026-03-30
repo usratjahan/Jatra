@@ -39,6 +39,27 @@ const EventDetail = () => {
       </div>
     );
 
+    // ── Error / not found ──
+  if (error || !event)
+    return (
+      <div className="min-h-screen bg-[#edfffd] pt-24 pb-16 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-6xl mb-4">🔍</div>
+          <h2 className="text-xl font-bold text-gray-700 mb-2">
+            Event not found
+          </h2>
+          <p className="text-gray-400 text-sm mb-6">
+            {error || "This event doesn't exist or has been removed."}
+          </p>
+          <button
+            onClick={() => navigate("/events")}
+            className="px-6 py-2.5 bg-teal-600 text-white rounded-full text-sm font-semibold hover:bg-teal-500 transition-colors"
+          >
+            Browse Events
+          </button>
+        </div>
+      </div>
+    );
 
   return (
     <div className="min-h-screen bg-[#edfffd] pt-24 pb-16">
