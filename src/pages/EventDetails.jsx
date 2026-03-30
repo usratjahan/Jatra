@@ -19,7 +19,7 @@ const EventDetail = () => {
   const { event, loading, error } = useEventDetail(id);
   const [activeTab, setActiveTab] = useState("itinerary");
 
-   // ── Loading skeleton ──
+  // ── Loading skeleton ──
   if (loading)
     return (
       <div className="min-h-screen bg-[#edfffd] pt-24 pb-16">
@@ -39,7 +39,7 @@ const EventDetail = () => {
       </div>
     );
 
-    // ── Error / not found ──
+  // ── Error / not found ──
   if (error || !event)
     return (
       <div className="min-h-screen bg-[#edfffd] pt-24 pb-16 flex items-center justify-center">
@@ -61,7 +61,7 @@ const EventDetail = () => {
       </div>
     );
 
-     // ── Active tab renderer ──
+  // ── Active tab renderer ──
   const renderTab = () => {
     switch (activeTab) {
       case "itinerary":
@@ -87,15 +87,61 @@ const EventDetail = () => {
         return null;
     }
   };
-  
+
   return (
     <div className="min-h-screen bg-[#edfffd] pt-24 pb-16">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <p className="text-teal-700 font-bold">Event loaded: {event?.title}</p>
-        <p className="text-gray-500 text-sm">Active tab: {activeTab}</p>
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        {/* Back button */}
+        <button
+          onClick={() => navigate(-1)}
+          className="mb-5 flex items-center gap-1.5 rounded-lg bg-green-700 px-3 py-2 text-sm font-medium text-white transition-colors cursor-pointer hover:bg-green-800"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="m15 18-6-6 6-6" />
+          </svg>
+          Back to Events
+        </button>
+
+        {/* ── TWO-COLUMN LAYOUT ── */}
+        <div className="flex flex-col items-stretch gap-5 lg:flex-row lg:items-start lg:gap-7">
+          {/* ── LEFT — main content ── */}
+          <div className="flex-1 min-w-0">
+            {/* Hero image with thumbnail strip */}
+            <EventDetailHeader event={event} />
+
+            {/* Title */}
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-5 mb-1">
+              {event.title}
+            </h1>
+
+            {/* Overview */}
+            <EventOverview event={event} />
+
+            {/* Tab bar */}
+            <EventTabs activeTab={activeTab} onTabChange={setActiveTab} />
+
+            {/* Tab content */}
+            <div className="min-h-48">{renderTab()}</div>
+          </div>
+
+          {/* ── RIGHT — sticky sidebar card ── */}
+          <div className="w-full lg:w-72 xl:w-80 flex-shrink-0">
+            <EventSidebarCard event={event} />
+          </div>
+        </div>
       </div>
     </div>
   );
 };
- 
+
 export default EventDetail;
