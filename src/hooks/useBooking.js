@@ -84,6 +84,93 @@ const useBooking = (event, currentUser) => {
       prev.map((t) => (t.id === id ? { ...t, [field]: e.target.value } : t))
     );
 
+  // ── Submit → open payment modal ──────────────────────────────
+  const handleSubmit = () => {
+    setError('');
+    if (!primary.fullName || !primary.email || !primary.phone) {
+      setError('Please fill in all required fields for the primary traveler.');
+      return;
+    }
+    if (!termsAccepted) {
+      setError('Please accept the Refund Policy and Terms & Conditions.');
+      return;
+    }
+    setPaymentOpen(true);
+  };
+
+  // ── After payment method selected ───────────────────────────
+  // TODO: POST /api/bookings
+  const submitBooking = async (method) => {
+    // const res = await fetch('/api/bookings', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     'Authorization': `Bearer ${currentUser?.token}`,
+    //   },
+    //   body: JSON.stringify({
+    //     eventId: event.id,
+    //     primaryTraveler: primary,
+    //     additionalTravelers: additionals,
+    //     priceType,
+    //     totalAmount: subtotal,
+    //     paymentMethod: method,
+    //   }),
+    // });
+    // const data = await res.json();
+    // return data;
+
+    // MOCK
+    await new Promise((r) => setTimeout(r, 800));
+
+    const bookingPayload = {
+      userId: currentUser?.id ?? primary.email,
+      eventId: Number(event?.id),
+      eventName: event?.title || 'Untitled Event',
+      location: event?.location || 'Unknown',
+      days: `${event?.dateFrom || ''} – ${event?.dateTo || ''}`,
+      totalAmount: subtotal,
+      priceType,
+      members: totalTravelers,
+      status: 'Confirmed',
+      paymentMethod: method,
+      primaryTraveler: {
+        fullName: primary.fullName,
+        email: primary.email,
+        phone: primary.phone,
+        address: primary.address,
+        nidNo: primary.nidNo,
+        emergencyContact: primary.emergencyContact,
+        emergencyRelationship: primary.emergencyRelationship,
+        whatsappNo: primary.whatsappNo,
+      },
+      additionalTravelers: additionals,
+    };
+
+    const savedBooking = await addBooking(bookingPayload);
+
+    const bookingEntry = {
+      id: savedBooking?.id || `JTR-${Date.now()}`,
+      eventTitle: event?.title || 'Untitled Event',
+      location: event?.location || 'Unknown',
+      sublocation: event?.sublocation || '',
+      dateFrom: event?.dateFrom || '',
+      dateTo: event?.dateTo || '',
+      travelers: totalTravelers,
+      totalPrice: subtotal,
+      status: 'confirmed',
+      bookedAt: new Date().toISOString().slice(0, 10),
+      image: event?.image || event?.images?.[0] || '',
+      paymentMethod: method,
+      priceType,
+    };
+
+    if (currentUser?.id) {
+      await addBookingForUser(currentUser.id, bookingEntry);
+    }
+
+    return { success: true, bookingId: bookingEntry.id, method };
+  };
+
   return {
     primary, updatePrimary,
     additionals, addTraveler, removeTraveler, updateAdditional,
@@ -92,6 +179,8 @@ const useBooking = (event, currentUser) => {
     paymentOpen, setPaymentOpen,
     termsAccepted, setTermsAccepted,
     error, setError,
+    handleSubmit,
+    submitBooking,
   };
 };
 
