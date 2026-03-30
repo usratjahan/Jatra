@@ -61,13 +61,41 @@ const EventDetail = () => {
       </div>
     );
 
+     // ── Active tab renderer ──
+  const renderTab = () => {
+    switch (activeTab) {
+      case "itinerary":
+        return <ItineraryTab itinerary={event.itinerary} />;
+      case "inclusions":
+        return <InclusionsTab inclusions={event.inclusions} />;
+      case "exclusions":
+        return <ExclusionsTab exclusions={event.exclusions} />;
+      case "disclaimer":
+        return <DisclaimerTab disclaimer={event.disclaimer} />;
+      case "terms":
+        return <TermsTab terms={event.terms} />;
+      case "review":
+        return (
+          <ReviewTab
+            avgRating={event.avgRating}
+            reviewCount={event.reviewCount}
+            reviews={event.reviews}
+            eventId={event.id}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+  
   return (
     <div className="min-h-screen bg-[#edfffd] pt-24 pb-16">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <p className="text-teal-700 font-bold">Event Detail page — id: {id}</p>
+        <p className="text-teal-700 font-bold">Event loaded: {event?.title}</p>
+        <p className="text-gray-500 text-sm">Active tab: {activeTab}</p>
       </div>
     </div>
   );
 };
-
+ 
 export default EventDetail;
