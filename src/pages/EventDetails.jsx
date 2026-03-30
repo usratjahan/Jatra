@@ -16,7 +16,29 @@ import ReviewTab from "../components/eventDetail/tabs/ReviewTab";
 const EventDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  
+  const { event, loading, error } = useEventDetail(id);
+  const [activeTab, setActiveTab] = useState("itinerary");
+
+   // ── Loading skeleton ──
+  if (loading)
+    return (
+      <div className="min-h-screen bg-[#edfffd] pt-24 pb-16">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="animate-pulse space-y-4">
+            <div className="h-80 bg-gray-200 rounded-2xl" />
+            <div className="flex flex-col gap-6 lg:flex-row">
+              <div className="flex-1 space-y-3">
+                <div className="h-6 bg-gray-200 rounded w-3/4" />
+                <div className="h-4 bg-gray-200 rounded w-full" />
+                <div className="h-4 bg-gray-200 rounded w-5/6" />
+              </div>
+              <div className="h-64 w-full rounded-2xl bg-gray-200 flex-shrink-0 lg:w-72 xl:w-80" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+
 
   return (
     <div className="min-h-screen bg-[#edfffd] pt-24 pb-16">
