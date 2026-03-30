@@ -11,6 +11,7 @@ import Female from "./components/Community/Female";
 import Combined from "./components/Community/Combined";
 import Explore from "./pages/Explore";
 import ContactUs from "./pages/ContactUs";
+import EventDetails from "./pages/EventDetails";
 
 const UserLayout = () => (
   <>
@@ -32,6 +33,7 @@ const App = () => {
             <Route path="/community/combined" element={<Combined />} />
            <Route path="/explore" element={<Explore />} />
            <Route path="/contact" element={<ContactUs />} />
+            <Route path="/events/:id" element={<EventDetails />} />
 
 
 </Route>
