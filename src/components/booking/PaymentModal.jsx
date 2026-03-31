@@ -156,6 +156,16 @@ const PaymentModal = ({ open, onClose, subtotal, submitBooking }) => {
                   Processing payment…
                 </div>
               )}
+
+              {/* Cancel button */}
+              <button
+                onClick={onClose}
+                disabled={loading}
+                className="w-full py-3 bg-[#0F393E] hover:bg-teal-700 disabled:opacity-50 text-white font-bold rounded-xl transition-all cursor-pointer active:scale-95"
+              >
+                Cancel Payment
+              </button>
+
             </div>
           </>
         )}
