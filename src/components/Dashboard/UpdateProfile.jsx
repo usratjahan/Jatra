@@ -52,7 +52,8 @@ const UpdateProfile = () => {
       setStatus("error");
     }
   };
-const inputCls =
+
+  const inputCls =
     "w-full bg-white text-gray-800 placeholder-gray-400 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-colors";
   const labelCls = "block text-white text-xs font-semibold mb-1.5";
 
@@ -127,6 +128,7 @@ const inputCls =
               className={inputCls}
             />
           </div>
+
           {/* Phone Number — BD flag + code prefix */}
           <div className="sm:col-start-1 lg:col-span-1">
             <label className={labelCls}>Phone Number</label>
@@ -175,10 +177,53 @@ const inputCls =
             />
           </div>
         </div>
- <p className="text-gray-400 text-sm">Submit button coming next...</p>
+
+        {/* Error / success messages */}
+        {errMsg && (
+          <p className="text-red-400 text-sm mb-4 font-medium">✗ {errMsg}</p>
+        )}
+        {status === "success" && (
+          <p className="text-green-400 text-sm mb-4 font-medium">
+            ✓ Profile updated! Redirecting...
+          </p>
+        )}
+
+        {/* Submit */}
+        <button
+          type="submit"
+          disabled={status === "loading"}
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-green-500 px-8 py-3 font-bold text-white transition-all duration-200 hover:bg-green-400 hover:shadow-lg hover:shadow-green-500/30 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:justify-start"
+        >
+          {status === "loading" ? (
+            <>
+              <svg
+                className="w-4 h-4 animate-spin"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                />
+              </svg>
+              Saving...
+            </>
+          ) : (
+            "Submit"
+          )}
+        </button>
       </form>
     </div>
   );
 };
- 
+
 export default UpdateProfile;
