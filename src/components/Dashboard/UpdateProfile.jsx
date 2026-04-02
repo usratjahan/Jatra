@@ -52,16 +52,133 @@ const UpdateProfile = () => {
       setStatus("error");
     }
   };
-return (
+const inputCls =
+    "w-full bg-white text-gray-800 placeholder-gray-400 border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-colors";
+  const labelCls = "block text-white text-xs font-semibold mb-1.5";
+
+  return (
     <div>
-      <h1 className="mb-6 text-2xl font-bold text-white sm:mb-8 sm:text-3xl">
-        Update Profile
-      </h1>
-      <p className="text-gray-300 text-sm">Form coming soon...</p>
+      <h1 className="mb-6 text-2xl font-bold text-white sm:mb-8 sm:text-3xl">Update Profile</h1>
+
+      <form onSubmit={handleSubmit}>
+        {/* 3-column grid — matches design exactly */}
+        <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
+          {/* First Name */}
+          <div>
+            <label className={labelCls}>First Name</label>
+            <input
+              type="text"
+              name="firstName"
+              value={form.firstName}
+              onChange={handleChange}
+              placeholder="First name"
+              className={inputCls}
+            />
+          </div>
+
+          {/* Last Name */}
+          <div>
+            <label className={labelCls}>Last Name</label>
+            <input
+              type="text"
+              name="lastName"
+              value={form.lastName}
+              onChange={handleChange}
+              placeholder="Last name"
+              className={inputCls}
+            />
+          </div>
+
+          {/* New Password */}
+          <div>
+            <label className={labelCls}>New Password</label>
+            <input
+              type="password"
+              name="newPassword"
+              value={form.newPassword}
+              onChange={handleChange}
+              placeholder="New password"
+              className={inputCls}
+            />
+          </div>
+
+          {/* Email Address */}
+          <div>
+            <label className={labelCls}>Email Address</label>
+            <input
+              type="email"
+              name="email"
+              value={form.email}
+              onChange={handleChange}
+              placeholder="you@gmail.com"
+              className={inputCls}
+            />
+          </div>
+
+          {/* Confirm New Password */}
+          <div>
+            <label className={labelCls}>Confirm New Password</label>
+            <input
+              type="password"
+              name="confirmPassword"
+              value={form.confirmPassword}
+              onChange={handleChange}
+              placeholder="Confirm password"
+              className={inputCls}
+            />
+          </div>
+          {/* Phone Number — BD flag + code prefix */}
+          <div className="sm:col-start-1 lg:col-span-1">
+            <label className={labelCls}>Phone Number</label>
+            <div className="flex items-center bg-white border border-gray-200 rounded-lg overflow-hidden focus-within:border-teal-500 focus-within:ring-1 focus-within:ring-teal-500 transition-colors">
+              {/* BD flag + code */}
+              <div className="flex items-center gap-1.5 px-3 border-r border-gray-200 bg-gray-50 h-full py-2.5 flex-shrink-0">
+                {/* 🇧🇩 flag emoji */}
+                <span className="text-base leading-none">🇧🇩</span>
+                <span className="text-gray-600 text-xs font-semibold">BD</span>
+                {/* Lucide ChevronDown */}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#6B7280"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </div>
+              <input
+                type="tel"
+                name="phone"
+                value={form.phone}
+                onChange={handleChange}
+                placeholder="17xxxxxxxx"
+                className="flex-1 px-3 py-2.5 text-sm text-gray-800 placeholder-gray-400 focus:outline-none bg-transparent"
+              />
+            </div>
+          </div>
+
+          {/* Address */}
+          <div>
+            <label className={labelCls}>Address</label>
+            <input
+              type="text"
+              name="address"
+              value={form.address}
+              onChange={handleChange}
+              placeholder="Your address"
+              className={inputCls}
+            />
+          </div>
+        </div>
+ <p className="text-gray-400 text-sm">Submit button coming next...</p>
+      </form>
     </div>
   );
 };
  
 export default UpdateProfile;
- 
-  
