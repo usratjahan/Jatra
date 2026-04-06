@@ -12,7 +12,11 @@ import Combined from "./components/Community/Combined";
 import Explore from "./pages/Explore";
 import ContactUs from "./pages/ContactUs";
 import EventDetails from "./pages/EventDetails";
-
+import DashboardLayout from "./components/Dashboard/DashboardLayout";
+import ProfilePage from "./components/Dashboard/ProfilePage";
+import BookingHistory from "./components/Dashboard/BookingHistory";
+import UpdateProfile from "./components/Dashboard/UpdateProfile";
+import { Navigate } from "react-router-dom";
 const UserLayout = () => (
   <>
     <Navbar />
@@ -34,6 +38,17 @@ const App = () => {
            <Route path="/explore" element={<Explore />} />
            <Route path="/contact" element={<ContactUs />} />
             <Route path="/events/:id" element={<EventDetails />} />
+            <Route
+            path="/dashboard"
+             element={<ProtectedRoute>
+              <DashboardLayout />
+              </ProtectedRoute>}
+              >
+<Route index element={<Navigate to="/dashboard/profile" replace />} />
+<Route path="profile" element={<ProfilePage />} />
+<Route path="bookings" element={<BookingHistory />} />
+<Route path="profile/edit" element={<UpdateProfile />} />
+</Route>
 
 
 </Route>
