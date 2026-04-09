@@ -48,7 +48,7 @@ const getAdminBookings = () => {
  * Sign up a new user.
  * TODO: replace body with → fetch('/api/auth/signup', { method:'POST', body: JSON.stringify(data) })
  */
-export const signUp = async ({ firstName, lastName, email, phone, password, role }) => {
+export const signUp = async ({ firstName , lastName, email, phone, password, role }) => {
   // TODO: uncomment for real API
   // const res = await fetch('/api/auth/signup', {
   //   method: 'POST',
@@ -81,6 +81,7 @@ export const signUp = async ({ firstName, lastName, email, phone, password, role
   saveUsers([...users, { ...newUser, password }]);
   const session = { ...newUser, token: `mock_token_${newUser.id}` };
   saveSession(session);
+  
   return session;
 };
 
