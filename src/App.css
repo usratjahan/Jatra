@@ -1,0 +1,115 @@
+/* ================= GOOGLE FONTS ================= */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,900;1,900&display=swap');
+
+/* ================= HERO ================= */
+.hero-title {
+  font-family: 'Playfair Display', serif;
+  line-height: 1.08;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #4ade80 0%, #22d3ee 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ================= ANIMATIONS ================= */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(36px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.fade-up {
+  animation: fadeUp 0.8s cubic-bezier(0.16,1,0.3,1) forwards;
+  opacity: 0;
+}
+
+.fade-in {
+  animation: fadeIn 1.2s ease forwards;
+  opacity: 0;
+}
+
+.d1 { animation-delay: 0.1s; }
+.d2 { animation-delay: 0.25s; }
+.d3 { animation-delay: 0.45s; }
+.d4 { animation-delay: 0.65s; }
+
+/* ================= CARD STAGGER ================= */
+.card-wrap {
+  animation: fadeUp 0.7s cubic-bezier(0.16,1,0.3,1) forwards;
+  opacity: 0;
+}
+
+.cw1 { animation-delay: 0.55s; }
+.cw2 { animation-delay: 0.68s; }
+.cw3 { animation-delay: 0.81s; }
+.cw4 { animation-delay: 0.94s; }
+
+/* ================= STACK / OVERLAP ================= */
+.cards-stack {
+  position: relative;
+  height: 520px;
+}
+
+@media (max-width: 1024px) {
+  .cards-stack {
+    height: auto;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+}
+
+@media (max-width: 580px) {
+  .cards-stack {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ================= SKELETON ================= */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.04) 25%,
+    rgba(255,255,255,0.09) 50%,
+    rgba(255,255,255,0.04) 75%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.4s infinite linear;
+  border-radius: 16px;
+  height: 360px;
+}
+
+/* ================= CLOUD ANIMATION ================= */
+@keyframes moveCloud {
+  0%   { transform: translateX(-120%); }
+  100% { transform: translateX(120%); }
+}
+
+@keyframes moveCloudFast {
+  0%   { transform: translateX(-140%); }
+  100% { transform: translateX(120%); }
+}
+
+.animate-moveCloud {
+  animation: moveCloud 40s linear infinite;
+}
+
+.animate-moveCloudFast {
+  animation: moveCloudFast 30s linear infinite;
+}
+.container{
+  max-width: 1280px;
+  margin: 0 auto;
+}

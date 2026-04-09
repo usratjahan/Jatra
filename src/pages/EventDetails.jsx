@@ -1,0 +1,147 @@
+import React, { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+
+import useEventDetail from "../hooks/useEventDetail";
+import EventDetailHeader from "../components/eventDetail/EventDetailHeader";
+import EventSidebarCard from "../components/eventDetail/EventSidebarCard";
+import EventOverview from "../components/eventDetail/EventOverview";
+import EventTabs from "../components/eventDetail/EventTabs";
+import ItineraryTab from "../components/eventDetail/tabs/ItineraryTab";
+import InclusionsTab from "../components/eventDetail/tabs/InclusionTab";
+import ExclusionsTab from "../components/eventDetail/tabs/ExclusionTab";
+import DisclaimerTab from "../components/eventDetail/tabs/Disclaimer";
+import TermsTab from "../components/eventDetail/tabs/TermsTab";
+import ReviewTab from "../components/eventDetail/tabs/ReviewTab";
+
+const EventDetail = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { event, loading, error } = useEventDetail(id);
+  const [activeTab, setActiveTab] = useState("itinerary");
+
+  // ── Loading skeleton ──
+  if (loading)
+    return (
+      <div className="min-h-screen bg-[#edfffd] pt-24 pb-16">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="animate-pulse space-y-4">
+            <div className="h-80 bg-gray-200 rounded-2xl" />
+            <div className="flex flex-col gap-6 lg:flex-row">
+              <div className="flex-1 space-y-3">
+                <div className="h-6 bg-gray-200 rounded w-3/4" />
+                <div className="h-4 bg-gray-200 rounded w-full" />
+                <div className="h-4 bg-gray-200 rounded w-5/6" />
+              </div>
+              <div className="h-64 w-full rounded-2xl bg-gray-200 flex-shrink-0 lg:w-72 xl:w-80" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+
+  // ── Error / not found ──
+  if (error || !event)
+    return (
+      <div className="min-h-screen bg-[#edfffd] pt-24 pb-16 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-6xl mb-4">🔍</div>
+          <h2 className="text-xl font-bold text-gray-700 mb-2">
+            Event not found
+          </h2>
+          <p className="text-gray-400 text-sm mb-6">
+            {error || "This event doesn't exist or has been removed."}
+          </p>
+          <button
+            onClick={() => navigate("/events")}
+            className="px-6 py-2.5 bg-teal-600 text-white rounded-full text-sm font-semibold hover:bg-teal-500 transition-colors"
+          >
+            Browse Events
+          </button>
+        </div>
+      </div>
+    );
+
+  // ── Active tab renderer ──
+  const renderTab = () => {
+    switch (activeTab) {
+      case "itinerary":
+        return <ItineraryTab itinerary={event.itinerary} />;
+      case "inclusions":
+        return <InclusionsTab inclusions={event.inclusions} />;
+      case "exclusions":
+        return <ExclusionsTab exclusions={event.exclusions} />;
+      case "disclaimer":
+        return <DisclaimerTab disclaimer={event.disclaimer} />;
+      case "terms":
+        return <TermsTab terms={event.terms} />;
+      case "review":
+        return (
+          <ReviewTab
+            avgRating={event.avgRating}
+            reviewCount={event.reviewCount}
+            reviews={event.reviews}
+            eventId={event.id}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#edfffd] pt-24 pb-16">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        {/* Back button */}
+        <button
+          onClick={() => navigate(-1)}
+          className="mb-5 flex items-center gap-1.5 rounded-lg bg-green-700 px-3 py-2 text-sm font-medium text-white transition-colors cursor-pointer hover:bg-green-800"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="m15 18-6-6 6-6" />
+          </svg>
+          Back to Events
+        </button>
+
+        {/* ── TWO-COLUMN LAYOUT ── */}
+        <div className="flex flex-col items-stretch gap-5 lg:flex-row lg:items-start lg:gap-7">
+          {/* ── LEFT — main content ── */}
+          <div className="flex-1 min-w-0">
+            {/* Hero image with thumbnail strip */}
+            <EventDetailHeader event={event} />
+
+            {/* Title */}
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-5 mb-1">
+              {event.title}
+            </h1>
+
+            {/* Overview */}
+            <EventOverview event={event} />
+
+            {/* Tab bar */}
+            <EventTabs activeTab={activeTab} onTabChange={setActiveTab} />
+
+            {/* Tab content */}
+            <div className="min-h-48">{renderTab()}</div>
+          </div>
+
+          {/* ── RIGHT — sticky sidebar card ── */}
+          <div className="w-full lg:w-72 xl:w-80 flex-shrink-0">
+            <EventSidebarCard event={event} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default EventDetail;
