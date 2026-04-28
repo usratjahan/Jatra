@@ -1,27 +1,22 @@
 // FILE: src/services/adminService.js
 //
 // Central data service for admin panel.
-// Demo mode persistence:
-// - data is stored in browser localStorage for quick frontend development
-// - dashboard stats start from 0 when there are no bookings
-// - stats increase automatically after new bookings are created
-// - this is temporary client-side storage and should be replaced by backend APIs
-//   for shared, durable data across browsers/devices/environments
+// Uses backend APIs for shared, durable data across browsers/devices/environments.
+// Admin authentication via Firebase token or local admin session headers.
 //
-// All data lives in localStorage under these keys:
-//   jatra_users          → registered users (from authService)
-//   jatra_admin_events   → events created by admin
-//   jatra_bookings       → all bookings made by users
-//   jatra_contact_info   → editable contact page info
-//   jatra_messages       → user→admin messages (future)
+// API endpoints:
+// - /api/admin/users     → registered users
+// - /api/admin/bookings  → all bookings with optional filters
+// - /api/admin/stats     → dashboard statistics
+// - /api/admin/contact   → editable contact page info
+// - /api/tours           → admin-managed events
+// - /api/bookings        → booking CRUD operations
 //
-// TODO: replace each function body with real API calls
 // ═══════════════════════════════════════════════════════════════
 
 import { MOCK_EVENTS_DETAIL } from '../hooks/mockEventsDetail';
 
-const delay = (ms) => new Promise((r) => setTimeout(r, ms));
-const API_BASE = import.meta.env.VITE_API_URL;
+const API_BASE = 'http://localhost:5000/api';
 const getToken = () => {
   try {
     const session = JSON.parse(localStorage.getItem('jatra_session'));
@@ -61,90 +56,40 @@ const authHeaders = () => {
   }
 };
 
-// ── Keys ────────────────────────────────────────────────────────
-const FIREBASE_USER_META_KEY = 'jatra_firebase_user_meta';
-const KEYS = {
-  users:       'jatra_users',
-  events:      'jatra_admin_events',
-  bookings:    'jatra_bookings',
-  contact:     'jatra_contact_info',
-  messages:    'jatra_messages',
-};
-
-// ── Storage helpers ─────────────────────────────────────────────
-const read  = key => { try { return JSON.parse(localStorage.getItem(key)) || null; } catch { return null; } };
-const write = (key, val) => localStorage.setItem(key, JSON.stringify(val));
-const readFirebaseUserMeta = () => { try { return JSON.parse(localStorage.getItem(FIREBASE_USER_META_KEY)) || {}; } catch { return {}; } };
-
 // ════════════════════════════════════════════════════════════════
 // USERS
 // ════════════════════════════════════════════════════════════════
 
 export const getUsers = async () => {
-  // Try to fetch from backend API first
-  try {
-    if (API_BASE) {
-      const res = await fetch(`${API_BASE}/api/admin/users`, {
-        method: 'GET',
-        headers: authHeaders(),
-      });
-      if (res.ok) {
-        const users = await res.json();
-        console.log('Users fetched from backend:', users.length);
-        return users;
-      }
-    }
-  } catch (error) {
-    console.error('Failed to fetch users from backend:', error);
+  const res = await fetch(`${API_BASE}/admin/users`, {
+    headers: authHeaders(),
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || 'Failed to fetch users');
   }
 
-  // Fallback to localStorage
-  await delay(300);
-
-  const localUsers = read(KEYS.users);
-  if (Array.isArray(localUsers) && localUsers.length > 0) {
-    return localUsers;
-  }
-
-  const meta = readFirebaseUserMeta();
-  return Object.entries(meta).map(([id, data]) => ({
-    id,
-    firstName: data.firstName || '',
-    lastName: data.lastName || '',
-    fullName: `${data.firstName || ''} ${data.lastName || ''}`.trim(),
-    email: data.email || '',
-    phone: data.phone || '',
-    address: data.address || '',
-    role: data.role || 'user',
-    ...data,
-  }));
+  return res.json();
 };
 
 export const removeUser = async (userId) => {
-  // TODO: DELETE /api/admin/users/:id
-  await delay(300);
-  const users = read(KEYS.users) || [];
-  write(KEYS.users, users.filter(u => u.id !== userId));
+  const res = await fetch(`${API_BASE}/admin/users/${encodeURIComponent(userId)}`, {
+    method: 'DELETE',
+    headers: authHeaders(),
+  });
 
-  const meta = readFirebaseUserMeta();
-  if (meta[userId]) {
-    delete meta[userId];
-    write(FIREBASE_USER_META_KEY, meta);
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || 'Failed to remove user');
   }
+
+  return res.json();
 };
 
 // ════════════════════════════════════════════════════════════════
 // EVENTS  (admin-managed)
 // ════════════════════════════════════════════════════════════════
-
-// Seed from MOCK_EVENTS_DETAIL on first load
-const seedEvents = () => {
-  const existing = read(KEYS.events);
-  if (!existing) {
-    write(KEYS.events, MOCK_EVENTS_DETAIL);
-  }
-};
-seedEvents();
 
 export const getAdminEvents = async () => {
   const res = await fetch(`${API_BASE}/tours`);
@@ -154,25 +99,22 @@ export const getAdminEvents = async () => {
 
 export const createEvent = async (eventData) => {
   try {
-    // Try normal endpoint first
     const res = await fetch(`${API_BASE}/tours`, {
       method: 'POST',
       headers: authHeaders(),
       body: JSON.stringify(eventData),
     });
-    
+
     if (!res.ok) {
       const text = await res.text();
       console.error('API Error:', res.status, text);
-      
-      // For development, log more details
       if (res.status === 401 || res.status === 403) {
         console.error('Auth failed. Admin session:', getAdminSession());
         throw new Error(`Authentication failed (${res.status}): ${text}`);
       }
       throw new Error(text || `Request failed with status ${res.status}`);
     }
-    
+
     return res.json();
   } catch (error) {
     console.error('Create event error:', error);
@@ -186,10 +128,12 @@ export const updateEvent = async (id, eventData) => {
     headers: authHeaders(),
     body: JSON.stringify(eventData),
   });
+
   if (!res.ok) {
     const text = await res.text();
     throw new Error(text || 'Failed to update event');
   }
+
   return res.json();
 };
 
@@ -198,10 +142,12 @@ export const deleteEvent = async (id) => {
     method: 'DELETE',
     headers: authHeaders(),
   });
+
   if (!res.ok) {
     const text = await res.text();
     throw new Error(text || 'Failed to delete event');
   }
+
   return res.json();
 };
 
@@ -209,145 +155,154 @@ export const deleteEvent = async (id) => {
 // BOOKINGS
 // ════════════════════════════════════════════════════════════════
 
-// Seed mock bookings
-const seedBookings = () => {
-  const existing = read(KEYS.bookings);
-  if (!existing) {
-    // Start empty so dashboard metrics remain 0 until real bookings are created.
-    write(KEYS.bookings, []);
-  }
-};
-
 export const getBookings = async () => {
-  // Try to fetch from backend API first
-  try {
-    if (API_BASE) {
-      const res = await fetch(`${API_BASE}/api/admin/bookings`, {
-        method: 'GET',
-        headers: authHeaders(),
-      });
-      if (res.ok) {
-        const bookings = await res.json();
-        console.log('Bookings fetched from backend:', bookings.length);
-        return bookings;
-      }
-    }
-  } catch (error) {
-    console.error('Failed to fetch bookings from backend:', error);
+  const res = await fetch(`${API_BASE}/admin/bookings`, {
+    headers: authHeaders(),
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || 'Failed to fetch bookings');
   }
 
-  // Fallback to localStorage
-  await delay(300);
-  return read(KEYS.bookings) || [];
+  return res.json();
 };
 
 export const getBookingsByUser = async (userId) => {
-  // TODO: GET /api/admin/bookings?userId=:id
-  await delay(200);
-  const all = read(KEYS.bookings) || [];
-  return all.filter(b => b.userId === userId);
+  const url = new URL(`${API_BASE}/admin/bookings`);
+  url.searchParams.set('userId', userId);
+
+  const res = await fetch(url.toString(), {
+    headers: authHeaders(),
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || 'Failed to fetch bookings for user');
+  }
+
+  return res.json();
 };
 
 export const getBookingsByEvent = async (eventId) => {
-  // TODO: GET /api/admin/bookings?eventId=:id
-  await delay(200);
-  const all = read(KEYS.bookings) || [];
-  return all.filter(b => b.eventId === eventId);
+  const url = new URL(`${API_BASE}/admin/bookings`);
+  url.searchParams.set('eventId', eventId);
+
+  const res = await fetch(url.toString(), {
+    headers: authHeaders(),
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || 'Failed to fetch bookings for event');
+  }
+
+  return res.json();
 };
 
 export const addBooking = async (booking) => {
-  // TODO: POST /api/admin/bookings
-  await delay(400);
-  const all = read(KEYS.bookings) || [];
-  const newBooking = { ...booking, id: Date.now(), createdAt: new Date().toISOString() };
-  write(KEYS.bookings, [...all, newBooking]);
-  return newBooking;
+  const res = await fetch(`${API_BASE}/bookings`, {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify(booking),
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || 'Failed to create booking');
+  }
+
+  return res.json();
 };
 
 export const updateBooking = async (id, data) => {
-  // TODO: PUT /api/admin/bookings/:id
-  await delay(400);
-  const all = read(KEYS.bookings) || [];
-  const updated = all.map(b => b.id === id ? { ...b, ...data } : b);
-  write(KEYS.bookings, updated);
-  return updated.find(b => b.id === id);
+  const res = await fetch(`${API_BASE}/bookings/${encodeURIComponent(id)}`, {
+    method: 'PUT',
+    headers: authHeaders(),
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || 'Failed to update booking');
+  }
+
+  return res.json();
 };
 
 export const deleteBooking = async (id) => {
-  // Try to delete from backend API first
-  try {
-    if (API_BASE) {
-      const res = await fetch(`${API_BASE}/api/admin/bookings/${id}`, {
-        method: 'DELETE',
-        headers: authHeaders(),
-      });
-      if (res.ok) {
-        console.log('Booking deleted from backend:', id);
-      }
-    }
-  } catch (error) {
-    console.error('Failed to delete booking from backend:', error);
+  const res = await fetch(`${API_BASE}/bookings/${encodeURIComponent(id)}`, {
+    method: 'DELETE',
+    headers: authHeaders(),
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || 'Failed to delete booking');
   }
 
-  // Also delete from localStorage
-  await delay(300);
-  const all = read(KEYS.bookings) || [];
-  write(KEYS.bookings, all.filter(b => b.id !== id));
+  return res.json();
 };
 
-// ════════════════════════════════════════════════════════════════
-// ADDITIONAL TRAVELERS (within a booking)
-// ════════════════════════════════════════════════════════════════
-
 export const addAdditionalTraveler = async (bookingId, traveler) => {
-  // TODO: POST /api/admin/bookings/:id/travelers
-  await delay(300);
-  const all = read(KEYS.bookings) || [];
-  const updated = all.map(b => {
-    if (b.id !== bookingId) return b;
-    const newTraveler = { ...traveler, id: Date.now() };
-    return { ...b, additionalTravelers: [...(b.additionalTravelers || []), newTraveler] };
+  const res = await fetch(`${API_BASE}/bookings/${encodeURIComponent(bookingId)}/travelers`, {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify(traveler),
   });
-  write(KEYS.bookings, updated);
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || 'Failed to add additional traveler');
+  }
+
+  return res.json();
 };
 
 export const removeAdditionalTraveler = async (bookingId, travelerId) => {
-  // TODO: DELETE /api/admin/bookings/:id/travelers/:tid
-  await delay(300);
-  const all = read(KEYS.bookings) || [];
-  const updated = all.map(b => {
-    if (b.id !== bookingId) return b;
-    return { ...b, additionalTravelers: (b.additionalTravelers || []).filter(t => t.id !== travelerId) };
+  const res = await fetch(`${API_BASE}/bookings/${encodeURIComponent(bookingId)}/travelers/${encodeURIComponent(travelerId)}`, {
+    method: 'DELETE',
+    headers: authHeaders(),
   });
-  write(KEYS.bookings, updated);
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || 'Failed to remove additional traveler');
+  }
+
+  return res.json();
 };
 
 // ════════════════════════════════════════════════════════════════
 // CONTACT INFO  (syncs with ContactUs.jsx)
 // ════════════════════════════════════════════════════════════════
 
-const DEFAULT_CONTACT = {
-  phone:    '+880 1711-000000',
-  phone2:   '+880 1722-000000',
-  email:    'info@jatra.com',
-  email2:   'support@jatra.com',
-  address:  'House 12, Road 5, Dhanmondi, Dhaka-1209',
-  whatsapp: '+880 1711-000000',
-  facebook: 'https://facebook.com/jatra',
-  twitter:  'https://twitter.com/jatra',
-  instagram:'https://instagram.com/jatra',
-  linkedin: 'https://linkedin.com/company/jatra',
-};
+export const getContactInfo = async () => {
+  const res = await fetch(`${API_BASE}/admin/contact`, {
+    headers: authHeaders(),
+  });
 
-export const getContactInfo = () => {
-  // TODO: GET /api/admin/contact
-  return read(KEYS.contact) || DEFAULT_CONTACT;
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || 'Failed to fetch contact info');
+  }
+
+  return res.json();
 };
 
 export const updateContactInfo = async (data) => {
-  // TODO: PUT /api/admin/contact
-  await delay(300);
-  write(KEYS.contact, data);
+  const res = await fetch(`${API_BASE}/admin/contact`, {
+    method: 'PUT',
+    headers: authHeaders(),
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || 'Failed to update contact info');
+  }
+
+  return res.json();
 };
 
 // ════════════════════════════════════════════════════════════════
@@ -355,35 +310,14 @@ export const updateContactInfo = async (data) => {
 // ════════════════════════════════════════════════════════════════
 
 export const getDashboardStats = async () => {
-  // TODO: GET /api/admin/stats
-  await delay(300);
-  const users = await getUsers();
+  const res = await fetch(`${API_BASE}/admin/stats`, {
+    headers: authHeaders(),
+  });
 
-  let events = [];
-  try {
-    events = await getAdminEvents();
-  } catch (error) {
-    events = read(KEYS.events) || [];
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || 'Failed to fetch dashboard stats');
   }
 
-  const bookings = read(KEYS.bookings) || [];
-
-  // Only count non-cancelled bookings in financial/stat totals.
-  const activeBookings = bookings.filter(
-    (b) => String(b?.status || '').toLowerCase() !== 'cancelled'
-  );
-
-  const totalRevenue = activeBookings.reduce((sum, b) => sum + Number(b.totalAmount || 0), 0);
-  const totalSales   = activeBookings.length;
-  const totalProfit  = Math.round(totalRevenue * 0.10);
-
-  return {
-    totalUsers:   users.length,
-    totalEvents:  events.length,
-    totalRevenue,
-    totalSales,
-    totalProfit,
-  };
+  return res.json();
 };
-
-seedBookings();
