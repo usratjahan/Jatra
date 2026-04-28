@@ -43,11 +43,21 @@ const UserInformation = () => {
       setBookings(b);
       setLoading(false);
     };
+
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') load();
+    };
+
     bootstrap();
+    window.addEventListener('focus', load);
+    document.addEventListener('visibilitychange', onVisibility);
+
     return () => {
       active = false;
+      window.removeEventListener('focus', load);
+      document.removeEventListener('visibilitychange', onVisibility);
     };
-  }, []);
+  }, [load]);
 
   const handleRemoveUser = async (userId) => {
     if (!confirm("Remove this user permanently?")) return;
