@@ -16,7 +16,7 @@
 
 import { MOCK_EVENTS_DETAIL } from '../hooks/mockEventsDetail';
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = import.meta.env.VITE_API_URL;
 const getToken = () => {
   try {
     const session = JSON.parse(localStorage.getItem('jatra_session'));
