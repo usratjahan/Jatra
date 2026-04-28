@@ -448,6 +448,28 @@ export const getUserBookings = async (userId) => {
  * Append a booking into the current user's booking history.
  */
 export const addBookingForUser = async (userId, booking) => {
+  // Try to save to backend API first
+  try {
+    const token = getToken();
+    if (token && API_BASE) {
+      const res = await fetch(`${API_BASE}/api/bookings`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(booking),
+      });
+      if (res.ok) {
+        const savedBooking = await res.json();
+        console.log('Booking saved to backend:', savedBooking);
+      }
+    }
+  } catch (error) {
+    console.error('Failed to save booking to backend:', error);
+  }
+
+  // Also save to localStorage as fallback
   await delay(150);
   const bookingsByUser = getBookingsByUser();
   const existingBookings = bookingsByUser[userId] || [];

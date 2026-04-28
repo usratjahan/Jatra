@@ -911,6 +911,27 @@ app.get('/api/admin/referrals', verifyToken, requireAdmin, async (req, res) => {
   }
 });
 
+// Admin: Get all bookings
+app.get('/api/admin/bookings', verifyToken, requireAdmin, async (req, res) => {
+  try {
+    const snapshot = await db.collection('bookings').orderBy('createdAt', 'desc').get();
+    const bookings = snapshot.docs.map(safeDoc);
+    res.json(bookings);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Admin: Delete a booking
+app.delete('/api/admin/bookings/:bookingId', verifyToken, requireAdmin, async (req, res) => {
+  try {
+    await db.collection('bookings').doc(req.params.bookingId).delete();
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

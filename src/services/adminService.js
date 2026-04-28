@@ -202,7 +202,24 @@ const seedBookings = () => {
 };
 
 export const getBookings = async () => {
-  // TODO: GET /api/admin/bookings
+  // Try to fetch from backend API first
+  try {
+    if (API_BASE) {
+      const res = await fetch(`${API_BASE}/api/admin/bookings`, {
+        method: 'GET',
+        headers: authHeaders(),
+      });
+      if (res.ok) {
+        const bookings = await res.json();
+        console.log('Bookings fetched from backend:', bookings.length);
+        return bookings;
+      }
+    }
+  } catch (error) {
+    console.error('Failed to fetch bookings from backend:', error);
+  }
+
+  // Fallback to localStorage
   await delay(300);
   return read(KEYS.bookings) || [];
 };
@@ -240,7 +257,22 @@ export const updateBooking = async (id, data) => {
 };
 
 export const deleteBooking = async (id) => {
-  // TODO: DELETE /api/admin/bookings/:id
+  // Try to delete from backend API first
+  try {
+    if (API_BASE) {
+      const res = await fetch(`${API_BASE}/api/admin/bookings/${id}`, {
+        method: 'DELETE',
+        headers: authHeaders(),
+      });
+      if (res.ok) {
+        console.log('Booking deleted from backend:', id);
+      }
+    }
+  } catch (error) {
+    console.error('Failed to delete booking from backend:', error);
+  }
+
+  // Also delete from localStorage
   await delay(300);
   const all = read(KEYS.bookings) || [];
   write(KEYS.bookings, all.filter(b => b.id !== id));
