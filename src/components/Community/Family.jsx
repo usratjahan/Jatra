@@ -346,7 +346,7 @@ const Family = () => {
         setFiltered(raw);
       } catch (err) {
         console.error("Failed to load Family community events", err);
-        setError("Unable to load events. Please verify that the backend is running at http://localhost:5000.");
+        setError("Unable to load events. Please verify that the backend is running.");
         setEvents([]);
         setFiltered([]);
       } finally {
