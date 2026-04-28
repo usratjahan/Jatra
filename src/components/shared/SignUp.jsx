@@ -84,7 +84,7 @@ const SignUp = ({ onSwitchToSignin, role, onSuccess }) => {
               type="text"
               value={form.firstName}
               onChange={set("firstName")}
-              placeholder="Usrat"
+              placeholder="ABC"
               className="w-full px-4 py-3 bg-white border border-white/10 rounded-lg text-black text-sm placeholder:text-gray-500 focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 transition-colors"
             />
           </div>
@@ -96,7 +96,7 @@ const SignUp = ({ onSwitchToSignin, role, onSuccess }) => {
               type="text"
               value={form.lastName}
               onChange={set("lastName")}
-              placeholder="Jahan"
+              placeholder="XYZ"
               className="w-full px-4 py-3 bg-white border border-white/10 rounded-lg text-black text-sm placeholder:text-gray-500 focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 transition-colors"
             />
           </div>
