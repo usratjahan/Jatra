@@ -81,7 +81,24 @@ const readFirebaseUserMeta = () => { try { return JSON.parse(localStorage.getIte
 // ════════════════════════════════════════════════════════════════
 
 export const getUsers = async () => {
-  // TODO: GET /api/admin/users
+  // Try to fetch from backend API first
+  try {
+    if (API_BASE) {
+      const res = await fetch(`${API_BASE}/api/admin/users`, {
+        method: 'GET',
+        headers: authHeaders(),
+      });
+      if (res.ok) {
+        const users = await res.json();
+        console.log('Users fetched from backend:', users.length);
+        return users;
+      }
+    }
+  } catch (error) {
+    console.error('Failed to fetch users from backend:', error);
+  }
+
+  // Fallback to localStorage
   await delay(300);
 
   const localUsers = read(KEYS.users);
