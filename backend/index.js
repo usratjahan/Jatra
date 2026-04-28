@@ -102,6 +102,13 @@ const saveBase64Images = async (images) => {
 
 const SSLCommerzPayment = require('sslcommerz-lts');
 
+// 🔐 SSLCommerz credentials for testing
+const STORE_ID = process.env.SSLCOMMERZ_STORE_ID || "testbox";
+const STORE_PASSWORD = process.env.SSLCOMMERZ_STORE_PASSWORD || "qwerty";
+
+// 🌐 ngrok URL for testing
+const BASE_URL = process.env.BACKEND_URL || "http://localhost:5000";
+
 const safeDoc = (doc) => {
   const data = doc.data();
   const normalized = {};
@@ -206,14 +213,15 @@ const verifyToken = async (req, res, next) => {
     }
   } else {
     console.warn('No authentication provided - attempting development mode');
-    // In development, allow requests without auth to /api/tours
-    // This helps with testing
+    // In development, allow requests without auth and ensure the dev user exists.
+    // This makes payment endpoints work for local testing without a Firebase token.
+    const profile = await ensureUserProfile('dev-user', 'dev@localhost', 'Development User');
     req.user = {
       uid: 'dev-user',
       email: 'dev@localhost',
       name: 'Development User',
-      role: 'admin',
-      profile: { role: 'admin' },
+      role: profile.role || 'admin',
+      profile,
     };
     next();
   }
@@ -307,6 +315,120 @@ app.get('/api/users/:userId/bookings', verifyToken, requireSelfOrAdmin, async (r
     res.json(bookings);
   } catch (error) {
     console.error('Error fetching bookings:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/admin/users', verifyToken, requireAdmin, async (req, res) => {
+  try {
+    const snapshot = await db.collection('users').get();
+    const users = snapshot.docs.map(safeDoc);
+    res.json(users);
+  } catch (error) {
+    console.error('Error fetching admin users:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/admin/bookings', verifyToken, requireAdmin, async (req, res) => {
+  try {
+    let query = db.collection('bookings');
+    if (req.query.userId) query = query.where('userId', '==', String(req.query.userId));
+    if (req.query.eventId) query = query.where('eventId', '==', String(req.query.eventId));
+    const snapshot = await query.get();
+    const bookings = snapshot.docs.map(safeDoc);
+    res.json(bookings);
+  } catch (error) {
+    console.error('Error fetching admin bookings:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/admin/stats', verifyToken, requireAdmin, async (req, res) => {
+  try {
+    const [usersSnapshot, toursSnapshot, bookingsSnapshot] = await Promise.all([
+      db.collection('users').get(),
+      db.collection('tours').get(),
+      db.collection('bookings').get(),
+    ]);
+
+    const users = usersSnapshot.docs.map(safeDoc);
+    const tours = toursSnapshot.docs.map(safeDoc);
+    const bookings = bookingsSnapshot.docs.map(safeDoc);
+
+    const activeBookings = bookings.filter((booking) =>
+      !['cancelled', 'canceled'].includes(String(booking.status || '').toLowerCase())
+    );
+
+    const totalRevenue = activeBookings.reduce(
+      (sum, booking) => sum + Number(booking.totalAmount || 0),
+      0
+    );
+    const totalSales = activeBookings.length;
+    const totalProfit = Math.round(totalRevenue * 0.10);
+
+    res.json({
+      totalUsers: users.length,
+      totalEvents: tours.length,
+      totalRevenue,
+      totalSales,
+      totalProfit,
+    });
+  } catch (error) {
+    console.error('Error fetching admin stats:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/admin/contact', verifyToken, requireAdmin, async (req, res) => {
+  try {
+    const contactDoc = await db.collection('settings').doc('contact').get();
+    if (!contactDoc.exists) {
+      // Return default contact info
+      const defaultContact = {
+        phone: '+880 1711-000000',
+        phone2: '+880 1722-000000',
+        email: 'info@jatra.com',
+        email2: 'support@jatra.com',
+        address: 'House 12, Road 5, Dhanmondi, Dhaka-1209',
+        whatsapp: '+880 1711-000000',
+        facebook: 'https://facebook.com/jatra',
+        twitter: 'https://twitter.com/jatra',
+        instagram: 'https://instagram.com/jatra',
+        linkedin: 'https://linkedin.com/company/jatra',
+      };
+      res.json(defaultContact);
+    } else {
+      res.json(contactDoc.data());
+    }
+  } catch (error) {
+    console.error('Error fetching contact info:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put('/api/admin/contact', verifyToken, requireAdmin, async (req, res) => {
+  try {
+    const contactData = req.body;
+    await db.collection('settings').doc('contact').set(contactData, { merge: true });
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error updating contact info:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.delete('/api/admin/users/:userId', verifyToken, requireAdmin, async (req, res) => {
+  try {
+    const userRef = db.collection('users').doc(req.params.userId);
+    const userSnap = await userRef.get();
+    if (!userSnap.exists) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    await userRef.delete();
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting admin user:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -510,6 +632,96 @@ app.post('/api/bookings', verifyToken, async (req, res) => {
   }
 });
 
+app.put('/api/bookings/:bookingId', verifyToken, requireAdmin, async (req, res) => {
+  try {
+    const bookingRef = db.collection('bookings').doc(req.params.bookingId);
+    const bookingSnap = await bookingRef.get();
+    if (!bookingSnap.exists) {
+      return res.status(404).json({ error: 'Booking not found' });
+    }
+
+    const updateData = {
+      ...req.body,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    };
+
+    await bookingRef.set(updateData, { merge: true });
+    const updated = await bookingRef.get();
+    res.json(safeDoc(updated));
+  } catch (error) {
+    console.error('Error updating booking:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.delete('/api/bookings/:bookingId', verifyToken, requireAdmin, async (req, res) => {
+  try {
+    const bookingRef = db.collection('bookings').doc(req.params.bookingId);
+    const bookingSnap = await bookingRef.get();
+    if (!bookingSnap.exists) {
+      return res.status(404).json({ error: 'Booking not found' });
+    }
+
+    await bookingRef.delete();
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting booking:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/bookings/:bookingId/travelers', verifyToken, requireAdmin, async (req, res) => {
+  try {
+    const bookingRef = db.collection('bookings').doc(req.params.bookingId);
+    const bookingSnap = await bookingRef.get();
+    if (!bookingSnap.exists) {
+      return res.status(404).json({ error: 'Booking not found' });
+    }
+
+    const booking = safeDoc(bookingSnap);
+    const currentTravelers = Array.isArray(booking.additionalTravelers) ? booking.additionalTravelers : [];
+    const newTraveler = {
+      ...req.body,
+      id: `${Date.now()}`,
+    };
+
+    await bookingRef.set({
+      additionalTravelers: [...currentTravelers, newTraveler],
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    }, { merge: true });
+
+    res.json({ success: true, traveler: newTraveler });
+  } catch (error) {
+    console.error('Error adding additional traveler:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.delete('/api/bookings/:bookingId/travelers/:travelerId', verifyToken, requireAdmin, async (req, res) => {
+  try {
+    const bookingRef = db.collection('bookings').doc(req.params.bookingId);
+    const bookingSnap = await bookingRef.get();
+    if (!bookingSnap.exists) {
+      return res.status(404).json({ error: 'Booking not found' });
+    }
+
+    const booking = safeDoc(bookingSnap);
+    const updatedTravelers = (booking.additionalTravelers || []).filter(
+      (traveler) => String(traveler.id) !== String(req.params.travelerId)
+    );
+
+    await bookingRef.set({
+      additionalTravelers: updatedTravelers,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    }, { merge: true });
+
+    res.json({ success: true, additionalTravelers: updatedTravelers });
+  } catch (error) {
+    console.error('Error removing additional traveler:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.post('/api/bookings/book-tour', verifyToken, async (req, res) => {
   try {
     console.log('Creating booking for user:', req.user.uid);
@@ -624,38 +836,6 @@ app.post('/api/payments', verifyToken, async (req, res) => {
     }
     const user = userSnap.data();
 
-    if (method === 'bkash') {
-      const payment = {
-        bookingId,
-        userId: booking.userId,
-        customerEmail: user.email,
-        amount: parseNumber(amount, 0),
-        method,
-        status: 'success',
-        gateway: 'bkash',
-        transactionId: `BKASH-${bookingId}-${Date.now()}`,
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      };
-
-      const docRef = await db.collection('payments').add(payment);
-      await db.collection('bookings').doc(bookingId).update({
-        paymentStatus: 'success',
-        paymentMethod: method,
-        paymentTransactionId: payment.transactionId,
-        status: 'confirmed',
-        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      });
-
-      return res.json({
-        id: docRef.id,
-        success: true,
-        bookingId,
-        status: 'success',
-        booking_status: 'confirmed',
-        ...payment,
-      });
-    }
-
     // SSLCommerz configuration
     console.log('SSLCommerz config:', {
       storeId: process.env.SSLCOMMERZ_STORE_ID,
@@ -738,36 +918,10 @@ app.post('/api/payments', verifyToken, async (req, res) => {
         ...payment
       });
     } else {
-      console.warn('SSLCommerz did not return GatewayPageURL, using mock URL for testing');
-      // Create payment record anyway
-      const payment = {
-        bookingId,
-        userId: booking.userId,
-        customerEmail: user.email,
-        amount: parseNumber(amount, 0),
-        method,
-        status: 'initiated',
-        gateway: 'sslcommerz',
-        transactionId: data.tran_id,
-        sslcommerz_sessionkey: data.tran_id,
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      };
-
-      const docRef = await db.collection('payments').add(payment);
-      await db.collection('bookings').doc(bookingId).update({
-        paymentStatus: 'initiated',
-        paymentMethod: method,
-        paymentTransactionId: data.tran_id,
-        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      });
-
-      // Mock gateway URL for testing - redirects to success page
-      const mockGatewayUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/payment/success?booking_id=${bookingId}`;
-      res.json({
-        id: docRef.id,
-        gateway_url: mockGatewayUrl,
-        sessionkey: data.tran_id,
-        ...payment
+      console.error('SSLCommerz did not return GatewayPageURL:', response);
+      return res.status(500).json({
+        error: 'Payment initiation failed - no GatewayPageURL',
+        response
       });
     }
   } catch (error) {
@@ -911,36 +1065,79 @@ app.get('/api/admin/referrals', verifyToken, requireAdmin, async (req, res) => {
   }
 });
 
-// Admin: Get all bookings
-app.get('/api/admin/bookings', verifyToken, requireAdmin, async (req, res) => {
+// ✅ Simple Test Payment Route
+app.get("/pay", async (req, res) => {
+  const sslcommerz = new SSLCommerzPayment(STORE_ID, STORE_PASSWORD, true); // sandbox
+
+  const data = {
+    total_amount: 100,
+    currency: "BDT",
+    tran_id: "TXN_" + Date.now(),
+    success_url: BASE_URL + "/success",
+    fail_url: BASE_URL + "/fail",
+    cancel_url: BASE_URL + "/cancel",
+    ipn_url: BASE_URL + "/ipn",
+    cus_name: "Test User",
+    cus_email: "test@mail.com",
+    cus_add1: "Dhaka",
+    cus_phone: "01700000000",
+    product_name: "DRACO Payment",
+    product_category: "Service",
+    product_profile: "general"
+  };
+
+  console.log('Test SSLCommerz init with:', {
+    storeId: STORE_ID,
+    storePassword: STORE_PASSWORD ? '***' : null,
+    isSandbox: true,
+    baseUrl: BASE_URL,
+    data
+  });
+
   try {
-    const snapshot = await db.collection('bookings').orderBy('createdAt', 'desc').get();
-    const bookings = snapshot.docs.map(safeDoc);
-    res.json(bookings);
+    const response = await sslcommerz.init(data);
+    console.log('Test SSLCommerz response:', response);
+    if (response.GatewayPageURL) {
+      res.redirect(response.GatewayPageURL);
+    } else {
+      return res.status(500).json({
+        error: 'Payment initiation failed - no GatewayPageURL',
+        response,
+        data
+      });
+    }
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Payment init error:", error);
+    res.status(500).json({
+      error: "Payment initiation failed",
+      message: error.message,
+      stack: error.stack
+    });
   }
 });
 
-// Admin: Get all users
-app.get('/api/admin/users', verifyToken, requireAdmin, async (req, res) => {
-  try {
-    const snapshot = await db.collection('users').get();
-    const users = snapshot.docs.map(safeDoc);
-    res.json(users);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+// ✅ Success
+app.post("/success", (req, res) => {
+  console.log("SUCCESS DATA:", req.body);
+  res.send("✅ Payment Successful!");
 });
 
-// Admin: Delete a booking
-app.delete('/api/admin/bookings/:bookingId', verifyToken, requireAdmin, async (req, res) => {
-  try {
-    await db.collection('bookings').doc(req.params.bookingId).delete();
-    res.json({ success: true });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+// ❌ Fail
+app.post("/fail", (req, res) => {
+  console.log("FAIL DATA:", req.body);
+  res.send("❌ Payment Failed");
+});
+
+// ❌ Cancel
+app.post("/cancel", (req, res) => {
+  console.log("CANCEL DATA:", req.body);
+  res.send("⚠️ Payment Cancelled");
+});
+
+// 🔁 IPN
+app.post("/ipn", (req, res) => {
+  console.log("IPN DATA:", req.body);
+  res.sendStatus(200);
 });
 
 const PORT = process.env.PORT || 5000;
