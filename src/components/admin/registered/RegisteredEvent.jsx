@@ -184,11 +184,21 @@ const RegisteredEvent = () => {
       setBookings(bks);
       setLoading(false);
     };
+
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') load();
+    };
+
     bootstrap();
+    window.addEventListener('focus', load);
+    document.addEventListener('visibilitychange', onVisibility);
+
     return () => {
       active = false;
+      window.removeEventListener('focus', load);
+      document.removeEventListener('visibilitychange', onVisibility);
     };
-  }, []);
+  }, [load]);
 
   // Only events that have at least 1 booking
   const registeredEvents = events.filter(ev =>
